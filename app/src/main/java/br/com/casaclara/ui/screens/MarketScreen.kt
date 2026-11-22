@@ -30,6 +30,7 @@ import br.com.casaclara.ui.MARKET_CATEGORIES
 import br.com.casaclara.ui.MEAL_TYPES
 import br.com.casaclara.ui.WEEKDAYS
 import br.com.casaclara.ui.asState
+import br.com.casaclara.ui.components.Ill
 import br.com.casaclara.ui.components.AlertBox
 import br.com.casaclara.ui.components.BrandCard
 import br.com.casaclara.ui.components.CrudList
@@ -55,7 +56,7 @@ fun MarketScreen(c: AppContainer, nav: NavController, initialTab: Int) {
     var tab by rememberSaveable { mutableIntStateOf(initialTab) }
     Column {
         Row { TextButton(onClick = { nav.popBackStack() }) { Text("‹ Voltar") } }
-        Box(Modifier.padding(horizontal = 16.dp)) { ScreenHeader("Mercado e alimentação", "Lista na mão, cardápio planejado e nada estragando.", emoji = "🛒") }
+        Box(Modifier.padding(horizontal = 16.dp)) { ScreenHeader("Mercado e alimentação", "Lista na mão, cardápio planejado e nada estragando.", ill = Ill.CARRINHO, tone = Tone.VERDE) }
         Tabs(listOf("Lista", "Favoritos", "Cardápio", "Despensa", "Receitas"), tab) { tab = it }
         when (tab) {
             0 -> TabBody { ShoppingList(c, "MERCADO", MARKET_CATEGORIES, "Lista de compras", "Por categoria. Informe os preços que encontrar — o app não inventa preços.") }

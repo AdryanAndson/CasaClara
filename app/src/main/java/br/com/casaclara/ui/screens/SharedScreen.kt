@@ -32,6 +32,7 @@ import br.com.casaclara.domain.Routes
 import br.com.casaclara.domain.Shared
 import br.com.casaclara.ui.FREQ_LABEL
 import br.com.casaclara.ui.asState
+import br.com.casaclara.ui.components.Ill
 import br.com.casaclara.ui.components.AlertBox
 import br.com.casaclara.ui.components.BrandCard
 import br.com.casaclara.ui.components.CrudList
@@ -62,7 +63,7 @@ fun SharedScreen(c: AppContainer, nav: NavController, initialTab: Int) {
     val members by c.db.shared().members().asState(emptyList())
     Column {
         Row { TextButton(onClick = { nav.popBackStack() }) { Text("‹ Voltar") } }
-        Box(Modifier.padding(horizontal = 16.dp)) { ScreenHeader("Casa compartilhada", "Contas divididas, tarefas combinadas e amizade preservada.", emoji = "🧑‍🤝‍🧑") }
+        Box(Modifier.padding(horizontal = 16.dp)) { ScreenHeader("Casa compartilhada", "Contas divididas, tarefas combinadas e amizade preservada.", ill = Ill.GRUPO, tone = Tone.ROXO) }
         Tabs(listOf("Quem deve a quem", "Moradores", "Despesas", "Reembolsos", "Tarefas", "Acordos"), tab) { tab = it }
         if (members.size < 2 && tab in listOf(0, 2, 3)) {
             TabBody {

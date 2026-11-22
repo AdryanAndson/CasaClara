@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -42,7 +43,11 @@ class TourTest {
         return rule.onAllNodes(hasText(text, substring = substring)).onFirst()
     }
 
-    private fun tap(text: String, substring: Boolean = false) { node(text, substring).performClick(); rule.waitForIdle() }
+    private fun tap(text: String, substring: Boolean = false) {
+        val n = node(text, substring)
+        runCatching { n.performScrollTo() }
+        n.performClick(); rule.waitForIdle()
+    }
     private fun scrollDown() { rule.onRoot().performTouchInput { swipeUp() }; rule.waitForIdle() }
     private fun back() { rule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }; rule.waitForIdle() }
 

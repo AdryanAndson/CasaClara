@@ -61,6 +61,7 @@ import br.com.casaclara.ui.EXPENSE_CATEGORIES
 import br.com.casaclara.ui.INCOME_CATEGORIES
 import br.com.casaclara.ui.asState
 import br.com.casaclara.ui.billStatus
+import br.com.casaclara.ui.components.Ill
 import br.com.casaclara.ui.components.AlertBox
 import br.com.casaclara.ui.components.Bars
 import br.com.casaclara.ui.components.BrandCard
@@ -97,7 +98,7 @@ fun FinanceScreen(c: AppContainer, nav: NavController, initialTab: Int) {
     var tab by rememberSaveable { mutableIntStateOf(initialTab) }
     Column {
         androidx.compose.foundation.layout.Box(Modifier.padding(horizontal = 16.dp)) {
-            ScreenHeader("Finanças", "Quanto entrou, quanto saiu e quanto sobrou.", emoji = "💰")
+            ScreenHeader("Finanças", "Quanto entrou, quanto saiu e quanto sobrou.", ill = Ill.COFRINHO, tone = Tone.VERDE)
         }
         Tabs(TABS, tab) { tab = it }
         when (tab) {
@@ -508,7 +509,7 @@ private fun MetasTab(c: AppContainer, nav: NavController) {
             confirmButton = {
                 Button(enabled = (Money.parse(depValue) ?: 0) > 0, onClick = {
                     val v = Money.parse(depValue) ?: 0
-                    scope.launch { c.db.goals().upsert(g.copy(saved = g.saved + v)) }
+                    scope.launch { c.depositGoal(g, v) }
                     fb.celebrate(if (g.saved + v >= g.target) "Meta batida! Você é demais! 🎉" else "+${Money.format(v)} guardado. Boa!")
                     deposit = null
                 }) { Text("Guardar") }

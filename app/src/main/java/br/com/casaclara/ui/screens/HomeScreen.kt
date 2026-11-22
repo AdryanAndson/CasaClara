@@ -162,7 +162,7 @@ fun HomeScreen(c: AppContainer, nav: NavController) {
                 ItemRow(
                     title = t.title,
                     subtitle = if (s.never) "Ainda não registrada" else if (s.late) "Atrasada — sem culpa, é só fazer quando der" else "Hoje",
-                    extra = { TextButton(onClick = { scope.launch { c.db.houseTasks().markDone(t.id, Dates.todayEpoch()); fb.toast("Feito! Sua casa agradece.", Mood.COMEMORANDO) } }) { Text("Feito") } },
+                    extra = { TextButton(onClick = { scope.launch { c.markTaskDone(t); fb.toast("Feito! Sua casa agradece.", Mood.COMEMORANDO) } }) { Text("Feito") } },
                 )
             }
         }

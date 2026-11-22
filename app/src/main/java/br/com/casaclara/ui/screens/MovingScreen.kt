@@ -32,6 +32,7 @@ import br.com.casaclara.domain.Routes
 import br.com.casaclara.domain.content.Templates
 import br.com.casaclara.notifications.ReminderScheduler
 import br.com.casaclara.ui.asState
+import br.com.casaclara.ui.components.Ill
 import br.com.casaclara.ui.components.AlertBox
 import br.com.casaclara.ui.components.Bars
 import br.com.casaclara.ui.components.BrandCard
@@ -63,7 +64,7 @@ fun MovingScreen(c: AppContainer, nav: NavController, initialTab: Int) {
     var tab by rememberSaveable { mutableIntStateOf(initialTab) }
     Column {
         Row { TextButton(onClick = { nav.popBackStack() }) { Text("‹ Voltar") } }
-        Box(Modifier.padding(horizontal = 16.dp)) { ScreenHeader("Mudança e aluguel", "Do primeiro anúncio à primeira noite na casa nova.", emoji = "📦") }
+        Box(Modifier.padding(horizontal = 16.dp)) { ScreenHeader("Mudança e aluguel", "Do primeiro anúncio à primeira noite na casa nova.", ill = Ill.CAIXAS, tone = Tone.CORAL) }
         Tabs(listOf("Checklist", "Cronograma", "Documentos", "Custos", "Visita", "Imóveis", "Perguntas"), tab) { tab = it }
         when (tab) {
             0 -> ChecklistTab(c)

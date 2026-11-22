@@ -20,6 +20,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -113,14 +117,22 @@ fun toneColor(t: Tone): Color {
     }
 }
 
-/** Cartão no estilo "caricato": contorno marcado e cantos arredondados. */
+/** Sombra caricata: um "carimbo" escuro deslocado atrás do elemento. */
+fun Modifier.cartoonShadow(color: Color, radius: Dp = 20.dp, offset: Dp = 4.dp): Modifier = this.drawBehind {
+    val o = offset.toPx()
+    drawRoundRect(color, topLeft = androidx.compose.ui.geometry.Offset(o, o), size = size, cornerRadius = androidx.compose.ui.geometry.CornerRadius(radius.toPx()))
+}
+
+/** Cartão no estilo caricato: contorno grosso, cantos bem arredondados e sombra deslocada. */
 @Composable
 fun BrandCard(modifier: Modifier = Modifier, tone: Tone = Tone.NEUTRO, onClick: (() -> Unit)? = null, padding: Dp = 16.dp, content: @Composable ColumnScope.() -> Unit) {
     val colors = CardDefaults.cardColors(containerColor = toneColor(tone), contentColor = MaterialTheme.colorScheme.onSurface)
-    val border = BorderStroke(2.dp, LocalSoft.current.contorno)
-    val shape = RoundedCornerShape(20.dp)
-    if (onClick != null) Card(onClick = onClick, modifier = modifier.fillMaxWidth(), shape = shape, colors = colors, border = border) { Column(Modifier.padding(padding), content = content) }
-    else Card(modifier = modifier.fillMaxWidth(), shape = shape, colors = colors, border = border) { Column(Modifier.padding(padding), content = content) }
+    val ink = LocalSoft.current.contorno
+    val border = BorderStroke(2.5.dp, ink)
+    val shape = RoundedCornerShape(22.dp)
+    val m = modifier.padding(end = 4.dp, bottom = 4.dp).cartoonShadow(ink, 22.dp).fillMaxWidth()
+    if (onClick != null) Card(onClick = onClick, modifier = m, shape = shape, colors = colors, border = border) { Column(Modifier.padding(padding), content = content) }
+    else Card(modifier = m, shape = shape, colors = colors, border = border) { Column(Modifier.padding(padding), content = content) }
 }
 
 @Composable
@@ -131,17 +143,21 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier, action: (@Composab
     }
 }
 
+/** Cabeçalho caricato: faixa colorida com título grande e a Clarinha ou uma ilustração. */
 @Composable
-fun ScreenHeader(title: String, subtitle: String? = null, emoji: String? = null, mood: Mood? = null) {
-    Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        when {
-            mood != null -> Mascot(mood, 72.dp)
-            emoji != null -> EmojiBadge(emoji, 60.dp)
-        }
-        Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.semantics { heading() })
-            if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+fun ScreenHeader(title: String, subtitle: String? = null, emoji: String? = null, mood: Mood? = null, ill: Ill? = null, tone: Tone = Tone.AMARELO) {
+    BrandCard(Modifier.padding(top = 8.dp), tone = tone, padding = 14.dp) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.semantics { heading() })
+                if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+            }
+            Spacer(Modifier.width(8.dp))
+            when {
+                ill != null -> Illustration(ill, 92.dp)
+                mood != null -> Mascot(mood, 84.dp)
+                emoji != null -> EmojiBadge(emoji, 64.dp, Tone.NEUTRO)
+            }
         }
     }
 }
@@ -209,10 +225,10 @@ fun ProgressLine(value: Float, label: String, color: Color = Brand.Verde, modifi
 @Composable
 fun EmptyState(title: String, text: String, mood: Mood = Mood.PENSANDO, actionText: String? = null, onAction: (() -> Unit)? = null, secondary: (@Composable () -> Unit)? = null) {
     Column(Modifier.fillMaxWidth().padding(vertical = 20.dp, horizontal = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Mascot(mood, 90.dp)
-        Text(title, style = MaterialTheme.typography.titleMedium)
+        Mascot(mood, 110.dp)
+        Text(title, style = MaterialTheme.typography.titleLarge)
         Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.widthIn(max = 420.dp))
-        if (actionText != null && onAction != null) Button(onClick = onAction) { Text(actionText) }
+        if (actionText != null && onAction != null) AccentButton(actionText, Modifier.widthIn(min = 200.dp)) { onAction() }
         secondary?.invoke()
     }
 }
@@ -247,11 +263,12 @@ fun ItemRow(
     itemLabel: String = "item",
 ) {
     val done = checked == true
+    val ink = LocalSoft.current.contorno
     Card(
-        modifier = Modifier.fillMaxWidth().let { if (onClick != null) it.clickable(role = Role.Button, onClick = onClick) else it },
+        modifier = Modifier.padding(end = 3.dp, bottom = 3.dp).cartoonShadow(ink, 16.dp, 3.dp).fillMaxWidth().let { if (onClick != null) it.clickable(role = Role.Button, onClick = onClick) else it },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.5.dp, LocalSoft.current.contorno),
+        colors = CardDefaults.cardColors(containerColor = if (done) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface),
+        border = BorderStroke(2.dp, ink),
     ) {
         Row(Modifier.padding(horizontal = 8.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             if (checked != null) Checkbox(checked = checked, onCheckedChange = onCheck, modifier = Modifier.semantics { contentDescription = (if (done) "Desmarcar " else "Marcar ") + title })
@@ -294,15 +311,35 @@ fun Bars(data: List<Pair<String, Long>>, format: (Long) -> String, colors: List<
     }
 }
 
+/** Botão caricato: contorno, sombra e "afunda" ao ser pressionado. */
 @Composable
-fun PrimaryButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
-    Button(onClick = onClick, enabled = enabled, modifier = modifier.height(52.dp), shape = RoundedCornerShape(16.dp)) { Text(text, style = MaterialTheme.typography.labelLarge) }
+fun CartoonButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, container: Color, content: Color, height: Dp = 52.dp, onClick: () -> Unit) {
+    val ink = LocalSoft.current.contorno
+    val source = remember { MutableInteractionSource() }
+    val pressed by source.collectIsPressedAsState()
+    val press = if (pressed && enabled) 3.dp else 0.dp
+    Box(modifier.height(height + 4.dp)) {
+        Box(Modifier.matchParentSize().padding(top = 4.dp, start = 4.dp).clip(RoundedCornerShape(16.dp)).background(if (enabled) ink else ink.copy(alpha = 0.3f)))
+        Button(
+            onClick = onClick, enabled = enabled, interactionSource = source,
+            modifier = Modifier.fillMaxWidth().height(height).offset(x = press, y = press).border(2.5.dp, if (enabled) ink else ink.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = container, contentColor = content),
+        ) { Text(text, style = MaterialTheme.typography.labelLarge, maxLines = 2) }
+    }
 }
 
 @Composable
-fun SecondaryButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
-    OutlinedButton(onClick = onClick, enabled = enabled, modifier = modifier.height(48.dp), shape = RoundedCornerShape(16.dp), border = BorderStroke(2.dp, LocalSoft.current.contorno)) { Text(text) }
-}
+fun PrimaryButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) =
+    CartoonButton(text, modifier, enabled, MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary, onClick = onClick)
+
+@Composable
+fun SecondaryButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) =
+    CartoonButton(text, modifier, enabled, MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.onSurface, height = 48.dp, onClick = onClick)
+
+@Composable
+fun AccentButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) =
+    CartoonButton(text, modifier, enabled, Brand.Amarelo, Brand.Tinta, onClick = onClick)
 
 @Composable
 fun ProvideFeedback(feedback: Feedback, confirm: ConfirmState, content: @Composable () -> Unit) {

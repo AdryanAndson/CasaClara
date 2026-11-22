@@ -56,6 +56,7 @@ import br.com.casaclara.premium.BillingGateway
 import br.com.casaclara.premium.Plan
 import br.com.casaclara.premium.Plans
 import br.com.casaclara.ui.asState
+import br.com.casaclara.ui.components.Ill
 import br.com.casaclara.ui.components.AlertBox
 import br.com.casaclara.ui.components.BrandCard
 import br.com.casaclara.ui.components.CrudList
@@ -384,7 +385,7 @@ fun ContactsScreen(c: AppContainer, nav: NavController) {
     val ctx = LocalContext.current
     val kinds = listOf("EMERGENCIA" to "🚨 Emergência", "PROFISSIONAL" to "👷 Profissional", "IMPORTANTE" to "⭐ Importante (proprietário, síndico, imobiliária…)")
     Page(nav, "Contatos") {
-        ScreenHeader("Contatos e emergência", "Profissionais de confiança, contatos importantes da mudança e números de emergência.", emoji = "📇")
+        ScreenHeader("Contatos e emergência", "Profissionais de confiança, contatos importantes da mudança e números de emergência.", ill = Ill.FERRAMENTA, tone = Tone.CORAL)
         AlertBox("Emergência: Bombeiros 193 · SAMU 192 · Polícia 190 · Defesa Civil 199. Em situação de risco, saia do local e ligue de um lugar seguro.", "PERIGO")
         CrudList(
             items = items, itemName = "contato", masculine = true,

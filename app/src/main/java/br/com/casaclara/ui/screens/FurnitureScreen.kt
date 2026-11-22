@@ -28,6 +28,7 @@ import br.com.casaclara.domain.Dates
 import br.com.casaclara.domain.Money
 import br.com.casaclara.ui.ROOMS
 import br.com.casaclara.ui.asState
+import br.com.casaclara.ui.components.Ill
 import br.com.casaclara.ui.components.BrandCard
 import br.com.casaclara.ui.components.CrudList
 import br.com.casaclara.ui.components.EmptySpec
@@ -57,7 +58,7 @@ fun FurnitureScreen(c: AppContainer, nav: NavController, initialTab: Int) {
     var tab by rememberSaveable { mutableIntStateOf(initialTab) }
     Column {
         Row { TextButton(onClick = { nav.popBackStack() }) { Text("‹ Voltar") } }
-        Box(Modifier.padding(horizontal = 16.dp)) { ScreenHeader("Móveis e compras", "Calma, você não precisa comprar a casa inteira no primeiro dia.", emoji = "🛋️") }
+        Box(Modifier.padding(horizontal = 16.dp)) { ScreenHeader("Móveis e compras", "Calma, você não precisa comprar a casa inteira no primeiro dia.", ill = Ill.SOFA, tone = Tone.AZUL) }
         Tabs(listOf("Lista e orçamento", "Comparar opções"), tab) { tab = it }
         if (tab == 0) ItensTab(c) else CompararTab(c)
     }

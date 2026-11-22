@@ -45,6 +45,7 @@ import br.com.casaclara.ui.FREQ_LABEL
 import br.com.casaclara.ui.ROOMS
 import br.com.casaclara.ui.asState
 import br.com.casaclara.ui.billStatus
+import br.com.casaclara.ui.components.Ill
 import br.com.casaclara.ui.components.AlertBox
 import br.com.casaclara.ui.components.BrandCard
 import br.com.casaclara.ui.components.CrudList
@@ -75,7 +76,7 @@ import java.time.LocalDate
 fun HouseScreen(c: AppContainer, nav: NavController, initialTab: Int) {
     var tab by rememberSaveable { mutableIntStateOf(initialTab) }
     Column {
-        Box(Modifier.padding(horizontal = 16.dp)) { ScreenHeader("Casa", "Pouco todo dia vence a faxina de seis horas.", emoji = "🧹") }
+        Box(Modifier.padding(horizontal = 16.dp)) { ScreenHeader("Casa", "Pouco todo dia vence a faxina de seis horas.", ill = Ill.VASSOURA, tone = Tone.AZUL) }
         Tabs(listOf("Tarefas", "Limpeza por cômodo", "Calendário", "Compras da casa", "Inventário", "Garantias e notas"), tab) { tab = it }
         when (tab) {
             0 -> TarefasTab(c)
@@ -122,7 +123,7 @@ private fun TarefasTab(c: AppContainer) {
                     tags = { if (s.never || s.days <= 0) Tag(if (s.late) "atrasada" else "para hoje", if (s.late) Tone.CORAL else Tone.AMARELO) else Tag("em dia", Tone.VERDE) },
                     extra = {
                         val hoje = t.lastDone == Dates.todayEpoch()
-                        TextButton(enabled = !hoje, onClick = { scope.launch { c.db.houseTasks().markDone(t.id, Dates.todayEpoch()) }; fb.toast("Feito! Sua casa agradece.", Mood.COMEMORANDO) }) { Text(if (hoje) "✓ Hoje" else "Feito") }
+                        TextButton(enabled = !hoje, onClick = { scope.launch { c.markTaskDone(t) }; fb.toast("Feito! Sua casa agradece.", Mood.COMEMORANDO) }) { Text(if (hoje) "✓ Hoje" else "Feito") }
                         TextButton(onClick = {
                             scope.launch {
                                 val rep = when (t.frequency) { "DIARIA" -> "DIARIO"; "SEMANAL" -> "SEMANAL"; else -> "MENSAL" }

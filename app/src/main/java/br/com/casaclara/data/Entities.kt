@@ -16,6 +16,11 @@ data class TxEntity(
     val incomeType: String? = null, // FIXA | VARIAVEL | INFORMAL
     val payment: String? = null,
     val isDemo: Boolean = false,
+    /** v2: compra no cartão de crédito (id do cartão) e número de parcelas na fatura. */
+    val cardId: Long? = null,
+    val installments: Int = 1,
+    /** v2: gerado automaticamente por um lançamento recorrente. */
+    val recurringId: Long? = null,
 )
 
 @Entity(tableName = "bills")
@@ -267,6 +272,56 @@ data class GuideStateEntity(
 
 @Entity(tableName = "achievements")
 data class AchievementEntity(@PrimaryKey val id: String, val unlockedAt: Long)
+
+// ---------------------------- v2 ----------------------------
+
+@Entity(tableName = "cards")
+data class CardEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val limitAmount: Long? = null,
+    val closingDay: Int,
+    val dueDay: Int,
+    val color: String = "AZUL",
+    /** faturas pagas (yyyyMM separados por vírgula) */
+    val paidInvoices: String = "",
+    val isDemo: Boolean = false,
+) {
+    fun paidSet(): Set<Int> = paidInvoices.split(',').mapNotNull { it.trim().toIntOrNull() }.toSet()
+}
+
+@Entity(tableName = "recurring")
+data class RecurringEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val kind: String, // ENTRADA | SAIDA
+    val description: String,
+    val amount: Long,
+    val category: String = "Outros",
+    val day: Int,
+    val startMonth: Int,
+    val lastGenerated: Int? = null,
+    val active: Boolean = true,
+    val cardId: Long? = null,
+    val incomeType: String? = null,
+    val isDemo: Boolean = false,
+)
+
+@Entity(tableName = "goal_deposits")
+data class GoalDepositEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val goalId: Long,
+    val amount: Long,
+    val date: Long,
+    val note: String? = null,
+)
+
+@Entity(tableName = "task_log")
+data class TaskLogEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val taskId: Long,
+    val title: String,
+    val date: Long,
+)
 
 /** Contagens usadas pela jornada e pelas conquistas (uma única consulta observável). */
 data class Counts(

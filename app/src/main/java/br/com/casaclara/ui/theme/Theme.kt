@@ -13,7 +13,10 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import br.com.casaclara.R
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,7 +30,9 @@ object Brand {
     val Coral = Color(0xFFFF6B5B)
     val CoralEscuro = Color(0xFFC63D32)
     val Tinta = Color(0xFF1C2B39)
-    val Papel = Color(0xFFFFFAF0)
+    val Papel = Color(0xFFFFF6E3)
+    val Roxo = Color(0xFF8B6CEF)
+    val Rosa = Color(0xFFFF8FB1)
     val Bochecha = Color(0xFFFF8F84)
 }
 
@@ -53,26 +58,39 @@ private val Dark = darkColorScheme(
     error = Color(0xFFFFB4AB), onError = Color(0xFF690005), surfaceContainer = Color(0xFF202A34), surfaceContainerHigh = Color(0xFF26313C),
 )
 
+/** Baloo 2 (títulos, arredondada e expressiva) + Nunito (textos, muito legível). Licença OFL. */
+val Baloo = FontFamily(Font(R.font.baloo2_bold, FontWeight.Bold), Font(R.font.baloo2_extrabold, FontWeight.ExtraBold), Font(R.font.baloo2_extrabold, FontWeight.Black))
+val Nunito = FontFamily(
+    Font(R.font.nunito_regular, FontWeight.Normal), Font(R.font.nunito_semibold, FontWeight.SemiBold), Font(R.font.nunito_semibold, FontWeight.Medium),
+    Font(R.font.nunito_bold, FontWeight.Bold), Font(R.font.nunito_extrabold, FontWeight.ExtraBold), Font(R.font.nunito_extrabold, FontWeight.Black),
+)
+
 private val AppTypography = Typography().let { t ->
+    fun TextStyle.body() = copy(fontFamily = Nunito)
+    fun TextStyle.head(w: FontWeight) = copy(fontFamily = Baloo, fontWeight = w, letterSpacing = 0.sp)
     t.copy(
-        headlineLarge = t.headlineLarge.copy(fontWeight = FontWeight.Black, fontSize = 30.sp),
-        headlineMedium = t.headlineMedium.copy(fontWeight = FontWeight.Black, fontSize = 26.sp),
-        headlineSmall = t.headlineSmall.copy(fontWeight = FontWeight.ExtraBold, fontSize = 22.sp),
-        titleLarge = t.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
-        titleMedium = t.titleMedium.copy(fontWeight = FontWeight.Bold),
-        titleSmall = t.titleSmall.copy(fontWeight = FontWeight.Bold),
-        bodyLarge = t.bodyLarge.copy(fontSize = 17.sp, lineHeight = 25.sp),
-        bodyMedium = t.bodyMedium.copy(fontSize = 15.sp, lineHeight = 22.sp),
-        labelLarge = t.labelLarge.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp),
+        displayLarge = t.displayLarge.head(FontWeight.ExtraBold), displayMedium = t.displayMedium.head(FontWeight.ExtraBold), displaySmall = t.displaySmall.head(FontWeight.ExtraBold),
+        headlineLarge = t.headlineLarge.head(FontWeight.ExtraBold).copy(fontSize = 32.sp, lineHeight = 36.sp),
+        headlineMedium = t.headlineMedium.head(FontWeight.ExtraBold).copy(fontSize = 28.sp, lineHeight = 32.sp),
+        headlineSmall = t.headlineSmall.head(FontWeight.ExtraBold).copy(fontSize = 23.sp, lineHeight = 28.sp),
+        titleLarge = t.titleLarge.head(FontWeight.ExtraBold).copy(fontSize = 21.sp, lineHeight = 26.sp),
+        titleMedium = t.titleMedium.copy(fontFamily = Nunito, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp),
+        titleSmall = t.titleSmall.copy(fontFamily = Nunito, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp),
+        bodyLarge = t.bodyLarge.body().copy(fontSize = 17.sp, lineHeight = 25.sp),
+        bodyMedium = t.bodyMedium.body().copy(fontSize = 15.sp, lineHeight = 22.sp),
+        bodySmall = t.bodySmall.body().copy(fontSize = 13.sp, lineHeight = 18.sp),
+        labelLarge = t.labelLarge.copy(fontFamily = Nunito, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp),
+        labelMedium = t.labelMedium.copy(fontFamily = Nunito, fontWeight = FontWeight.Bold),
+        labelSmall = t.labelSmall.copy(fontFamily = Nunito, fontWeight = FontWeight.Bold),
     )
 }
-val BigNumber = TextStyle(fontWeight = FontWeight.Black, fontSize = 26.sp, letterSpacing = (-0.5).sp)
+val BigNumber = TextStyle(fontFamily = Baloo, fontWeight = FontWeight.ExtraBold, fontSize = 28.sp, lineHeight = 32.sp)
 
 @Composable
 fun CasaClaraTheme(mode: ThemeMode, textScale: Float, content: @Composable () -> Unit) {
     val dark = when (mode) { ThemeMode.SISTEMA -> isSystemInDarkTheme(); ThemeMode.CLARO -> false; ThemeMode.ESCURO -> true }
     val soft = if (dark) SoftColors(Color(0xFF173D2F), Color(0xFF41391A), Color(0xFF1E2F52), Color(0xFF4A2622), Color(0xFF33284A), Color(0xFF8C99A6))
-    else SoftColors(Color(0xFFD9F5E8), Color(0xFFFFF4C7), Color(0xFFDFE9FF), Color(0xFFFFE2DE), Color(0xFFEFE6FF), Brand.Tinta)
+    else SoftColors(Color(0xFFC4F1DC), Color(0xFFFFEDA6), Color(0xFFCFE0FF), Color(0xFFFFD3CC), Color(0xFFE6DBFF), Brand.Tinta)
     val d = LocalDensity.current
     CompositionLocalProvider(
         LocalSoft provides soft,

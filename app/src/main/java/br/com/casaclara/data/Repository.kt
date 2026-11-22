@@ -53,6 +53,45 @@ class AppContainer(val context: Context) {
         return novas.toList()
     }
 
+    // ------------------- ações com histórico -------------------
+    suspend fun markTaskDone(t: HouseTaskEntity) {
+        val today = Dates.todayEpoch()
+        db.houseTasks().markDone(t.id, today)
+        db.taskLog().insert(TaskLogEntity(taskId = t.id, title = t.title, date = today))
+    }
+
+    /** Guarda (ou retira, com valor negativo) dinheiro de uma meta, registrando no histórico. */
+    suspend fun depositGoal(g: GoalEntity, amount: Long, note: String? = null) {
+        val cur = db.goals().get(g.id) ?: g
+        db.goals().upsert(cur.copy(saved = (cur.saved + amount).coerceAtLeast(0)))
+        db.goalDeposits().insert(GoalDepositEntity(goalId = g.id, amount = amount, date = Dates.todayEpoch(), note = note))
+    }
+
+    /** Move dinheiro entre cofrinhos. */
+    suspend fun transferGoal(from: GoalEntity, to: GoalEntity, amount: Long) {
+        depositGoal(from, -amount, "Transferido para ${to.name}")
+        depositGoal(to, amount, "Veio de ${from.name}")
+    }
+
+    /** Cria os lançamentos recorrentes que já venceram (idempotente). Devolve quantos foram criados. */
+    suspend fun runRecurring(): Int {
+        val today = Dates.today()
+        var n = 0
+        for (r in db.recurring().active()) {
+            val months = br.com.casaclara.domain.Recurring.monthsToGenerate(r.startMonth, r.lastGenerated, r.day, today)
+            if (months.isEmpty()) continue
+            months.forEach { k ->
+                db.tx().upsert(
+                    TxEntity(kind = r.kind, description = r.description, amount = r.amount, date = Dates.dueInMonth(r.day, k).toEpochDay(), category = r.category,
+                        incomeType = r.incomeType, cardId = r.cardId, payment = if (r.cardId != null) "Crédito" else null, recurringId = r.id, isDemo = r.isDemo),
+                )
+                n++
+            }
+            db.recurring().upsert(r.copy(lastGenerated = months.last()))
+        }
+        return n
+    }
+
     // ------------------- listas sugeridas -------------------
     suspend fun loadChecklist(list: String) {
         val existing = db.checks().byList(list).first().map { it.grp + "|" + it.title }.toSet()
@@ -103,7 +142,7 @@ class AppContainer(val context: Context) {
     suspend fun removeDemo() {
         val s = db.stats()
         s.d1(); s.d2(); s.d3(); s.d4(); s.d5(); s.d6(); s.d7(); s.d8(); s.d9(); s.d10(); s.d11()
-        s.d12(); s.d13(); s.d14(); s.d15(); s.d16(); s.d17(); s.d18(); s.d19(); s.d20(); s.d21()
+        s.d12(); s.d13(); s.d14(); s.d15(); s.d16(); s.d17(); s.d18(); s.d19(); s.d20(); s.d21(); s.d22(); s.d23()
         prefs.update { it.copy(demoLoaded = false) }
     }
 

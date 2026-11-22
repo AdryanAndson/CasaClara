@@ -2,6 +2,7 @@ package br.com.casaclara.data
 
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
@@ -151,6 +152,30 @@ import kotlinx.coroutines.flow.Flow
     @Upsert suspend fun upsert(e: AchievementEntity)
 }
 
+@Dao interface CardDao {
+    @Query("SELECT * FROM cards ORDER BY id") fun all(): Flow<List<CardEntity>>
+    @Upsert suspend fun upsert(e: CardEntity): Long
+    @Delete suspend fun delete(e: CardEntity)
+}
+
+@Dao interface RecurringDao {
+    @Query("SELECT * FROM recurring ORDER BY day") fun all(): Flow<List<RecurringEntity>>
+    @Query("SELECT * FROM recurring WHERE active = 1") suspend fun active(): List<RecurringEntity>
+    @Upsert suspend fun upsert(e: RecurringEntity): Long
+    @Delete suspend fun delete(e: RecurringEntity)
+}
+
+@Dao interface GoalDepositDao {
+    @Query("SELECT * FROM goal_deposits ORDER BY date DESC, id DESC") fun all(): Flow<List<GoalDepositEntity>>
+    @Insert suspend fun insert(e: GoalDepositEntity): Long
+    @Query("DELETE FROM goal_deposits WHERE goalId = :goalId") suspend fun deleteForGoal(goalId: Long)
+}
+
+@Dao interface TaskLogDao {
+    @Query("SELECT * FROM task_log WHERE date >= :from ORDER BY date DESC, id DESC") fun since(from: Long): Flow<List<TaskLogEntity>>
+    @Insert suspend fun insert(e: TaskLogEntity): Long
+}
+
 @Dao interface StatsDao {
     @Query(
         """SELECT
@@ -216,4 +241,6 @@ import kotlinx.coroutines.flow.Flow
     @Query("DELETE FROM agreements WHERE isDemo = 1") suspend fun d19()
     @Query("DELETE FROM milestones WHERE isDemo = 1") suspend fun d20()
     @Query("DELETE FROM members WHERE isDemo = 1") suspend fun d21()
+    @Query("DELETE FROM cards WHERE isDemo = 1") suspend fun d22()
+    @Query("DELETE FROM recurring WHERE isDemo = 1") suspend fun d23()
 }

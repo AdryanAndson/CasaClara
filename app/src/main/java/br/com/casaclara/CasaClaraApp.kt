@@ -14,6 +14,7 @@ class CasaClaraApp : Application() {
         container = AppContainer(this)
         ReminderScheduler.createChannel(this)
         container.scope.launch {
+            runCatching { container.runRecurring() }
             runCatching { ReminderScheduler.rescheduleAll(this@CasaClaraApp, container.db.reminders().enabled()) }
         }
     }
