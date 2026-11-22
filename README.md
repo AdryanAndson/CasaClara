@@ -129,3 +129,12 @@ Baixe o APK: https://github.com/AdryanAndson/CasaClara/releases/download/apk/Cas
 - **É golpe?**: detector com 10 perguntas, nível de risco e o que fazer.
 - **Teste rápido**: 32 perguntas (10 por rodada), cada uma ligada a um guia.
 - 6 novas conquistas e banco de dados v3 com migração automática (v1 → v2 → v3 testada no emulador).
+
+
+## Versão 3.0.0 — pronta para a Play Store
+
+- targetSdk 36 (exigência da Play desde 31/08/2026), AGP 8.10, R8 + encolhimento de recursos, profileinstaller.
+- Abertura da versão de publicação cerca de 3× mais rápida que a de teste no emulador Android 8 (cerca de 0,6 s contra cerca de 2 s).
+- O CI gera o `.aab` **sem assinatura** (release `play-build`); a assinatura com a chave de upload é feita fora do repositório.
+- A versão minificada é instalada no emulador (Android 8 e 16) e passa por 800 toques aleatórios (monkey) sem travar.
+- Política de privacidade: `docs/privacidade.html` (ative o GitHub Pages em Settings › Pages › main /docs).
