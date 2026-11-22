@@ -13,7 +13,6 @@ import br.com.casaclara.data.UserPrefs
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
-@Composable
 /**
  * Coleta um Flow como estado. O Flow é lembrado entre recomposições (as consultas do Room criam um Flow novo
  * a cada chamada; sem isso a coleta reiniciava a cada recomposição, piscando listas vazias e gastando bateria).
