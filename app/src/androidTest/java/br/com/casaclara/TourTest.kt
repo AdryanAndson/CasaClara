@@ -48,7 +48,7 @@ class TourTest {
         runCatching { n.performScrollTo() }
         n.performClick(); rule.waitForIdle()
     }
-    private fun scrollDown() { rule.onRoot().performTouchInput { swipeUp() }; rule.waitForIdle() }
+    private fun scrollDown() { runCatching { rule.onAllNodes(androidx.compose.ui.test.hasScrollAction()).onFirst().performTouchInput { swipeUp(startY = bottom * 0.85f, endY = top + 10f, durationMillis = 400) } }; rule.waitForIdle(); Thread.sleep(600) }
     private fun back() { rule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }; rule.waitForIdle() }
 
     @Test
@@ -74,7 +74,7 @@ class TourTest {
             tap("Cartões"); shot("cartoes")
             tap("Cofrinhos"); shot("cofrinhos")
             tap("Casa"); shot("casa")
-            tap("Plano da semana", substring = true); shot("plano-semana"); back()
+            tap("🗓️ Semana"); shot("plano-semana"); back()
             tap("Mais"); shot("mais")
             tap("Faxina cronometrada"); shot("faxina"); back()
             tap("Importar extrato"); shot("importar"); back()

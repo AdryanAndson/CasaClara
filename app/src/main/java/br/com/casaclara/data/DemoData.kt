@@ -19,6 +19,10 @@ object DemoData {
             Triple("Streaming (exemplo)", 4000L, "Assinaturas"), Triple("Farmácia (exemplo)", 6500L, "Saúde"),
             Triple("Lanche com amigos (exemplo)", 9000L, "Lazer"), Triple("Conta de celular (exemplo)", 5500L, "Contas da casa"),
         ).forEachIndexed { i, (d, v, c) -> t.upsert(TxEntity(kind = "SAIDA", description = d, amount = v, date = day(2 + i * 2), category = c, isDemo = true)) }
+        val cardId = db.cards().upsert(CardEntity(name = "Cartão roxo (exemplo)", limitAmount = 150000, closingDay = 25, dueDay = 5, color = "ROXO", paidInvoices = "", isDemo = true))
+        t.upsert(TxEntity(kind = "SAIDA", description = "Ventilador (exemplo)", amount = 36000, date = day(8), category = "Casa", payment = "Crédito", cardId = cardId, installments = 3, isDemo = true))
+        db.recurring().upsert(RecurringEntity(kind = "SAIDA", description = "Streaming (exemplo)", amount = 4000, category = "Assinaturas", day = 6,
+            startMonth = br.com.casaclara.domain.Dates.monthKey(today.toEpochDay()), lastGenerated = br.com.casaclara.domain.Dates.monthKey(today.toEpochDay()), active = true, cardId = null, incomeType = null, isDemo = true))
         db.bills().upsert(BillEntity(name = "Internet (exemplo)", amount = 10000, dueDay = 15, isDemo = true))
         db.bills().upsert(BillEntity(name = "Celular (exemplo)", amount = 5500, dueDay = 10, isDemo = true))
         db.debts().upsert(DebtEntity(name = "Notebook parcelado (exemplo)", creditor = "Loja", kind = "PARCELADO", installment = 18000, total = 10, paid = 4, dueDay = 20, isDemo = true))

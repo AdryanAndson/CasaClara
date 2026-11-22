@@ -97,7 +97,7 @@ private fun TarefasTab(c: AppContainer, nav: NavController) {
     val pend = tasks.count { taskStatus(it).days <= 0 }
     TabBody {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            br.com.casaclara.ui.components.SecondaryButton("🗓️ Plano da semana", Modifier.weight(1f)) { nav.navigate(br.com.casaclara.domain.Routes.WEEKPLAN) }
+            br.com.casaclara.ui.components.SecondaryButton("🗓️ Semana", Modifier.weight(1f)) { nav.navigate(br.com.casaclara.domain.Routes.WEEKPLAN) }
             br.com.casaclara.ui.components.SecondaryButton("⏱️ Faxina", Modifier.weight(1f)) { nav.navigate(br.com.casaclara.domain.Routes.TIMER) }
         }
         if (tasks.isNotEmpty()) BrandCard(tone = Tone.VERDE) {
