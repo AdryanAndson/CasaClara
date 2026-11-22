@@ -7,6 +7,33 @@ object BemEstarGuides {
 
     val all = listOf(
         Guide(
+            "dia-ruim", "emocional", "Sentimentos", "Kit para dias difíceis", "🌧️", 4, FACIL,
+            problem = "Todo mundo tem dias em que nada dá certo. Ter um plano simples pronto, feito num dia bom, ajuda a atravessar o dia ruim com menos peso.",
+            steps = listOf(
+                "Num dia bom, escreva três coisas pequenas que costumam te ajudar: um banho demorado, uma música, uma caminhada curta.",
+                "Deixe uma comida fácil e gostosa guardada para esses dias.",
+                "Baixe a régua: no dia ruim, o objetivo é só o básico (comer, beber água, descansar).",
+                "Mande mensagem para alguém de confiança dizendo que o dia está pesado.",
+                "Se os dias difíceis estiverem ficando frequentes, procure a UBS ou um profissional de saúde mental.",
+            ),
+            checklist = listOf("Anotei meu kit para dias difíceis"),
+            related = listOf("solidao", "pedir-ajuda", "doente-sozinho"),
+            alert = APOIO,
+        ),
+        Guide(
+            "comparacao-redes", "emocional", "Sentimentos", "Comparação nas redes sociais", "📱", 4, FACIL,
+            problem = "Nas redes, todo mundo parece ter uma casa linda e a vida resolvida. Comparar o seu bastidor com o palco dos outros desanima e pode até levar a gastos por impulso.",
+            steps = listOf(
+                "Lembre que as redes mostram recortes escolhidos, não a vida inteira.",
+                "Silencie perfis que te deixam pior ou com vontade de comprar sem precisar.",
+                "Defina horários sem celular, como na primeira hora do dia e na cama.",
+                "Compare você com você mesmo: veja quanto já conquistou na sua jornada no app.",
+                "Antes de comprar algo que viu numa propaganda, espere 48 horas.",
+            ),
+            checklist = listOf("Silenciei perfis que me fazem mal", "Defini um horário sem celular"),
+            related = listOf("evitar-impulso", "dia-ruim"),
+        ),
+        Guide(
             "solidao", "emocional", "Sentimentos", "Quando a solidão aperta", "🫂", 4, FACIL,
             problem = "Morar sozinho traz liberdade, mas em alguns dias o silêncio pesa. Sentir isso é comum, e existem jeitos de cuidar desse sentimento.",
             steps = listOf(

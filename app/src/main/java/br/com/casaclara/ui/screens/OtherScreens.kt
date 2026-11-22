@@ -321,7 +321,8 @@ fun SettingsScreen(c: AppContainer, nav: NavController) {
             modifier = Modifier.fillMaxWidth(),
         ) { Text("Apagar todos os dados") }
         SectionTitle("Sobre")
-        Text("Casa Clara 1.0.0 — Sua casa, seu jeito. Vamos nessa!", fontWeight = FontWeight.Bold)
+        val ver = remember { runCatching { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName }.getOrNull() ?: "" }
+        Text("Casa Clara $ver — Sua casa, seu jeito. Vamos nessa!", fontWeight = FontWeight.Bold)
         Text("Conteúdo educativo e geral. Não substitui orientação médica, psicológica, jurídica, financeira ou técnica profissional. Em emergências: Bombeiros 193 · SAMU 192 · Polícia 190.", style = MaterialTheme.typography.bodySmall)
     }
 }

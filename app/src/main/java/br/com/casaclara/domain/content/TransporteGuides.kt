@@ -5,6 +5,19 @@ import br.com.casaclara.domain.content.Difficulty.*
 object TransporteGuides {
     val all = listOf(
         Guide(
+            "planejar-trajeto", "transporte", "Rotina", "Planejar o trajeto para não se atrasar", "⏰", 4, FACIL,
+            problem = "Num endereço novo, o caminho até o trabalho ou a faculdade ainda é um mistério. Atrasos no começo pesam. Testar e planejar o trajeto tira a ansiedade.",
+            steps = listOf(
+                "Faça o trajeto uma vez antes do primeiro dia, de preferência no mesmo horário.",
+                "Use um app de mapas para ver horários reais do ônibus ou do metrô.",
+                "Tenha uma rota alternativa para quando a linha principal falhar.",
+                "Saia com uma folga de 15 minutos nas primeiras semanas.",
+                "Prepare na noite anterior o que vai levar: chave, cartão de transporte, carregador.",
+            ),
+            checklist = listOf("Testei o trajeto", "Tenho uma rota alternativa"),
+            related = listOf("conhecer-bairro", "bilhete-integracao"),
+        ),
+        Guide(
             "transporte-custo-real", "transporte", "Custos", "Quanto custa de verdade ir e voltar todo dia", "🚌", 4, FACIL,
             problem = "O transporte é o segundo maior gasto de muita gente depois da moradia. Morar mais longe para pagar menos aluguel pode sair mais caro no fim do mês.",
             steps = listOf(

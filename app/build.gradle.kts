@@ -13,8 +13,8 @@ android {
         applicationId = "br.com.casaclara"
         minSdk = 26
         targetSdk = 36
-        versionCode = 300
-        versionName = "3.0.0"
+        versionCode = 310
+        versionName = "3.1.0"
         vectorDrawables { useSupportLibrary = true }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
