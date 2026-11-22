@@ -1,5 +1,7 @@
 package br.com.casaclara
 
+import androidx.compose.ui.test.onAllNodesWithText
+
 import android.graphics.Bitmap
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.hasText
@@ -67,7 +69,9 @@ class TourTest {
             repeat(5) { tap("Pular esta pergunta") }
             shot("jornada-pronta")
             tap("Explorar com dados de exemplo")
-            Thread.sleep(7000) // espera o aviso de conquistas sumir
+            Thread.sleep(3000)
+            // fecha o aviso de conquistas (tocar nele fecha) para as capturas ficarem limpas
+            repeat(3) { runCatching { rule.onAllNodesWithText("conquista", substring = true).onFirst().performClick() }; Thread.sleep(700) }
             shot("inicio"); scrollDown(); shot("inicio-2"); scrollDown(); shot("inicio-3"); scrollDown(); shot("inicio-4")
             tap("Jornada"); shot("jornada")
             tap("Finanças"); shot("financas"); scrollDown(); shot("financas-2")
