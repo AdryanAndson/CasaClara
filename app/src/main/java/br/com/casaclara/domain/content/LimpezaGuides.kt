@@ -1,0 +1,155 @@
+package br.com.casaclara.domain.content
+
+import br.com.casaclara.domain.content.Difficulty.*
+
+object LimpezaGuides {
+    private val MISTURA = danger("Nunca misture produtos de limpeza (por exemplo, água sanitária com amoníaco, álcool, vinagre ou desinfetantes). A mistura pode liberar gases tóxicos. Use um produto por vez, com o ambiente ventilado.")
+
+    val all = listOf(
+        Guide(
+            "rotina-limpeza", "limpeza", "Rotina", "Como montar uma rotina simples de limpeza", "🗓️", 4, FACIL,
+            problem = "Quem deixa tudo para o fim de semana passa o domingo limpando. Pouco todo dia mantém a casa em ordem com menos esforço.",
+            steps = listOf(
+                "Todo dia (10 a 15 min): louça, cama arrumada, lixo da cozinha, guardar o que ficou fora do lugar.",
+                "Toda semana: banheiro, chão, roupas, troca de toalhas.",
+                "A cada 15 dias: roupa de cama, geladeira por fora, móveis.",
+                "Todo mês: geladeira por dentro, janelas, filtro da máquina de lavar.",
+                "Cadastre essas tarefas no app com a frequência e marque quando fizer.",
+            ),
+            example = "Exemplo de semana: segunda banheiro, quarta roupas, sábado chão da casa. O resto é só manutenção diária.",
+            mistakes = listOf("Montar uma rotina perfeita que não cabe na sua semana.", "Fazer tudo no mesmo dia e se esgotar."),
+            checklist = listOf("Defini as tarefas diárias", "Escolhi o dia de cada tarefa semanal", "Cadastrei no app"),
+            related = listOf("faxina-sem-sobrecarga", "pouco-tempo"),
+        ),
+        Guide(
+            "limpar-comodos", "limpeza", "Cômodos", "Como limpar cada cômodo", "🚪", 5, FACIL,
+            problem = "Sem uma ordem, a limpeza fica pela metade. A regra geral é: de cima para baixo e do fundo para a porta.",
+            steps = listOf(
+                "Abra janelas para ventilar.",
+                "Tire o pó de cima para baixo: prateleiras, móveis, depois o chão.",
+                "Limpe superfícies com pano úmido e o produto indicado para cada uma.",
+                "Varra ou aspire o chão, do fundo do cômodo para a porta.",
+                "Passe pano no chão por último, também saindo em direção à porta.",
+                "Use a lista de limpeza por cômodo do app para marcar o que já foi feito.",
+            ),
+            mistakes = listOf("Passar pano antes de varrer.", "Usar o mesmo pano do banheiro na cozinha."),
+            checklist = listOf("Ventilei", "Tirei o pó de cima para baixo", "Varri", "Passei pano"),
+            related = listOf("organizar-cozinha", "cuidar-banheiro"),
+            alert = MISTURA,
+        ),
+        Guide(
+            "organizar-cozinha", "limpeza", "Cômodos", "Como organizar a cozinha", "🍽️", 4, FACIL,
+            problem = "Cozinha desorganizada faz cozinhar parecer muito mais difícil. Cada coisa perto de onde é usada facilita tudo.",
+            steps = listOf(
+                "Guarde panelas perto do fogão e pratos e copos perto da pia ou da mesa.",
+                "Deixe na bancada só o que usa todo dia.",
+                "Agrupe mantimentos por tipo e coloque os mais antigos na frente.",
+                "Lave a louça logo depois de comer ou deixe de molho.",
+                "Limpe o fogão enquanto ainda está morno (desligado), porque a gordura sai mais fácil.",
+                "Tire o lixo orgânico com frequência para evitar insetos.",
+            ),
+            checklist = listOf("Bancada livre", "Panelas perto do fogão", "Mantimentos agrupados", "Lixo em dia"),
+            related = listOf("organizar-despensa", "utensilios-basicos"),
+        ),
+        Guide(
+            "cuidar-banheiro", "limpeza", "Cômodos", "Como cuidar do banheiro", "🚿", 4, FACIL,
+            problem = "O banheiro acumula umidade e sujeira rápido. Uma limpeza semanal e pequenos cuidados diários evitam mofo e mau cheiro.",
+            steps = listOf(
+                "Deixe a janela ou a porta aberta depois do banho para sair o vapor.",
+                "Puxe a água do box com rodinho depois do banho.",
+                "Uma vez por semana: vaso sanitário, pia, espelho, box e chão, com luvas.",
+                "Limpe o ralo para evitar entupimento e cheiro.",
+                "Troque as toalhas pelo menos uma vez por semana.",
+            ),
+            checklist = listOf("Ventilação depois do banho", "Limpeza semanal", "Ralo limpo", "Toalhas trocadas"),
+            related = listOf("limpar-comodos", "umidade"),
+            alert = MISTURA,
+        ),
+        Guide(
+            "lavar-roupas", "limpeza", "Roupas", "Como lavar roupas e separar tecidos", "👕", 5, FACIL,
+            problem = "Camiseta branca que ficou rosa, blusa que encolheu... A maioria dos acidentes com roupa vem de não separar e não ler a etiqueta.",
+            steps = listOf(
+                "Separe por cor: brancas, claras e escuras.",
+                "Separe também por tipo: toalhas e jeans à parte de peças delicadas.",
+                "Leia a etiqueta: ela indica temperatura, se pode usar alvejante, se pode ir na secadora e se pode torcer.",
+                "Esvazie os bolsos e feche zíperes.",
+                "Use a quantidade de sabão indicada na embalagem — mais sabão não limpa mais.",
+                "Estenda logo depois que terminar, para não ficar com cheiro.",
+            ),
+            mistakes = listOf("Encher demais a máquina.", "Lavar peça nova colorida junto com as claras.", "Deixar roupa molhada dentro da máquina."),
+            checklist = listOf("Separei por cor", "Li as etiquetas", "Esvaziei os bolsos", "Estendi logo"),
+            related = listOf("tirar-manchas", "rotina-limpeza"),
+        ),
+        Guide(
+            "tirar-manchas", "limpeza", "Roupas", "Como tirar manchas comuns com segurança", "🧼", 4, MEDIO,
+            problem = "Quanto mais tempo uma mancha fica, mais difícil sai. Alguns cuidados simples resolvem a maior parte delas.",
+            steps = listOf(
+                "Aja rápido: tire o excesso sem esfregar, apenas pressionando com papel ou pano.",
+                "Teste qualquer produto em uma parte escondida da peça antes.",
+                "Gordura: detergente neutro na mancha, deixe agir alguns minutos e lave normalmente.",
+                "Sangue: água fria e sabão. Água quente pode fixar a mancha.",
+                "Café ou suco: água fria logo, depois sabão neutro.",
+                "Se a peça for delicada ou cara, procure uma lavanderia.",
+            ),
+            mistakes = listOf("Esfregar com força e espalhar a mancha.", "Usar água quente em mancha de sangue.", "Misturar produtos para \"potencializar\"."),
+            checklist = listOf("Removi o excesso", "Testei o produto", "Usei água fria quando indicado"),
+            related = listOf("lavar-roupas"),
+            alert = MISTURA,
+        ),
+        Guide(
+            "armarios-pequenos", "limpeza", "Organização", "Como organizar armários pequenos", "🗄️", 4, FACIL,
+            problem = "Espaço pequeno com coisa demais vira bagunça em dois dias. Organizar é, antes de tudo, decidir o que fica.",
+            steps = listOf(
+                "Tire tudo do armário e separe: uso sempre, uso às vezes, não uso.",
+                "Doe ou venda o que não usa há mais de um ano.",
+                "Use a altura: prateleiras extras, ganchos atrás da porta, caixas empilháveis.",
+                "Guarde o que usa sempre na altura dos olhos e das mãos.",
+                "Dobre roupas em pé (como arquivos) nas gavetas para ver tudo.",
+                "Regra prática: entrou uma peça nova, considere sair uma antiga.",
+            ),
+            checklist = listOf("Tirei tudo e separei", "Doei o que não uso", "Usei o espaço vertical"),
+            related = listOf("pouco-tempo", "adaptar-casa"),
+        ),
+        Guide(
+            "pouco-tempo", "limpeza", "Rotina", "Como manter a casa arrumada com pouco tempo", "⚡", 3, FACIL,
+            problem = "Trabalho, estudo e deslocamento deixam pouco tempo. A boa notícia: casa arrumada depende mais de hábito do que de tempo.",
+            steps = listOf(
+                "Regra dos 2 minutos: se leva menos de 2 minutos, faça agora.",
+                "Arrume 10 minutos antes de dormir, com um timer.",
+                "Tenha um lugar fixo para chaves, carteira e correspondência.",
+                "Não deixe louça para o dia seguinte — ou deixe de molho, no mínimo.",
+                "Reduza objetos: menos coisas, menos para arrumar.",
+            ),
+            checklist = listOf("Faço a regra dos 2 minutos", "Tenho 10 minutos de arrumação à noite", "Cada coisa tem seu lugar"),
+            related = listOf("rotina-limpeza", "evitar-acumular"),
+        ),
+        Guide(
+            "dividir-tarefas", "limpeza", "Convivência", "Como dividir tarefas entre moradores", "🤝", 3, FACIL,
+            problem = "Quando não há divisão clara, sempre sobra para alguém — e o clima azeda. Uma escala simples resolve.",
+            steps = listOf(
+                "Listem todas as tarefas da casa, inclusive as invisíveis (comprar papel higiênico, tirar o lixo).",
+                "Dividam de forma justa, considerando tempo e esforço de cada tarefa.",
+                "Façam rodízio das tarefas mais chatas.",
+                "Registrem a escala na aba de tarefas compartilhadas do app.",
+                "Revisem a divisão a cada mês.",
+            ),
+            checklist = listOf("Listamos todas as tarefas", "Dividimos com rodízio", "Registramos no app"),
+            related = listOf("combinar-tarefas", "evitar-conflitos"),
+        ),
+        Guide(
+            "faxina-sem-sobrecarga", "limpeza", "Rotina", "Como organizar uma faxina sem se sobrecarregar", "🧽", 4, FACIL,
+            problem = "Faxina grande cansa e desanima. Dividir em blocos e começar pelo que mais incomoda torna tudo possível.",
+            steps = listOf(
+                "Escolha 1 ou 2 cômodos por dia, em vez da casa toda.",
+                "Separe os materiais antes de começar, para não ficar indo e voltando.",
+                "Comece pelo que mais incomoda você — a motivação vem do resultado.",
+                "Trabalhe em blocos de 25 minutos com pausas curtas.",
+                "Coloque uma música ou um podcast e beba água.",
+                "Pare quando terminar o combinado, mesmo que \"dê para fazer mais\".",
+            ),
+            checklist = listOf("Escolhi os cômodos do dia", "Separei os materiais", "Fiz pausas"),
+            related = listOf("rotina-limpeza", "sobrecarregado"),
+            alert = MISTURA,
+        ),
+    )
+}

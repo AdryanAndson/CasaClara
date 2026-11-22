@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.CasaClara" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/papel</item>
+    </style>
+</resources>

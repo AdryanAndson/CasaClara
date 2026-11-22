@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Backup automático do Android (conta Google do próprio usuário). Dados financeiros não vão para servidores do Casa Clara. -->
+<full-backup-content>
+    <include domain="database" path="casaclara.db" />
+    <include domain="sharedpref" path="." />
+    <include domain="file" path="datastore/" />
+</full-backup-content>

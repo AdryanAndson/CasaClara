@@ -1,0 +1,128 @@
+package br.com.casaclara.domain.content
+
+import br.com.casaclara.domain.content.Difficulty.*
+
+object PreparoGuides {
+    val all = listOf(
+        Guide(
+            "estou-pronto", "preparo", "Antes de decidir", "Como saber se estou pronto para morar sozinho", "🤔", 4, FACIL,
+            problem = "A vontade de ter o próprio canto é grande, mas bate a dúvida: será que eu dou conta? Estar pronto não é saber tudo — é ter dinheiro mínimo organizado e saber se virar no básico.",
+            steps = listOf(
+                "Some quanto custaria por mês morar sozinho na sua cidade (aluguel, contas, mercado, transporte). Use a calculadora de custo mensal.",
+                "Compare com a sua renda líquida (o que cai na conta). Se a moradia passa de 30% a 40% da renda, o plano precisa de ajuste.",
+                "Veja se você tem guardado o custo inicial da mudança (caução, frete, o básico da casa) e algum valor para imprevistos.",
+                "Faça um teste prático por um mês: cozinhe, lave roupa e pague suas contas como se já morasse sozinho.",
+                "Liste o que ainda falta e transforme em metas com prazo. Pronto não é perfeito: é ter um plano.",
+            ),
+            example = "Exemplo (valores ilustrativos, troque pelos seus): renda de R$ 3.000, aluguel + condomínio de R$ 900 (30%) e outros custos de R$ 1.300. Sobram R$ 800 por mês — dá para ir, guardando parte para emergências.",
+            mistakes = listOf("Olhar só o valor do aluguel e esquecer condomínio, IPTU e contas.", "Contar com renda que ainda não é garantida (promoção, freela incerto).", "Sair sem nenhum dinheiro guardado para o primeiro imprevisto."),
+            checklist = listOf("Calculei o custo mensal", "Comparei com minha renda", "Sei quanto preciso para o custo inicial", "Fiz um mês de teste de rotina"),
+            related = listOf("custo-real", "plano-sem-pressa", "reserva-antes"),
+        ),
+        Guide(
+            "planejar-saida", "preparo", "Planejamento", "Como planejar a saída da casa dos pais", "🗺️", 5, MEDIO,
+            problem = "Sair de casa envolve dinheiro, documentos, imóvel, móveis e conversa com a família. Sem plano, tudo acontece ao mesmo tempo e vira estresse.",
+            steps = listOf(
+                "Defina uma data-alvo aproximada (por exemplo, daqui a 6 ou 12 meses). Ela pode mudar, mas dá direção.",
+                "Calcule o custo mensal e o custo inicial da mudança e transforme o custo inicial em meta de economia.",
+                "Divida o tempo até a data em fases: juntar dinheiro, aprender o básico da casa, procurar imóvel, mudar.",
+                "Separe documentos e comprovantes de renda com antecedência — imobiliárias costumam pedir.",
+                "Comece a procurar imóvel uns 30 a 60 dias antes da data, quando o dinheiro já estiver quase todo guardado.",
+                "Revise o plano todo mês: o que avançou, o que atrasou, o que precisa mudar.",
+            ),
+            example = "Plano de 8 meses (exemplo): meses 1 a 5 juntando e treinando rotina; mês 6 pesquisando bairros; mês 7 visitando imóveis; mês 8 assinatura e mudança.",
+            mistakes = listOf("Começar procurando imóvel antes de ter o dinheiro do custo inicial.", "Não deixar folga no cronograma para imprevistos.", "Planejar sozinho algo que afeta a família sem conversar antes."),
+            checklist = listOf("Defini uma data-alvo", "Criei a meta do custo inicial", "Separei meus documentos", "Montei o cronograma em fases"),
+            related = listOf("conversar-familia", "antes-de-procurar", "plano-sem-pressa"),
+        ),
+        Guide(
+            "custo-real", "preparo", "Planejamento", "Como calcular o custo real de morar sozinho", "🧮", 4, FACIL,
+            problem = "O aluguel é só a parte mais visível. O custo real inclui condomínio, IPTU, contas, mercado, transporte, limpeza e pequenos gastos que antes a família pagava sem você perceber.",
+            steps = listOf(
+                "Pesquise aluguéis reais em anúncios do bairro que você quer e anote também condomínio e IPTU.",
+                "Pergunte para quem mora sozinho perto de você quanto paga de luz, água, gás e internet.",
+                "Estime o mercado com base em uma lista de compras real que você montar (use a lista do app com os preços que encontrar).",
+                "Some transporte do novo endereço até o trabalho ou estudo — ele pode mudar bastante.",
+                "Inclua higiene, limpeza, farmácia, assinaturas e lazer.",
+                "Some tudo e acrescente uma folga de 10% para imprevistos.",
+            ),
+            example = "Exemplo ilustrativo: aluguel R$ 1.000 + condomínio R$ 250 + IPTU R$ 40 + contas R$ 280 + mercado R$ 600 + transporte R$ 220 + outros R$ 200 = R$ 2.590. Com 10% de folga: cerca de R$ 2.850.",
+            mistakes = listOf("Usar preços antigos ou de outra cidade.", "Esquecer gastos anuais (IPTU, seguro) divididos por mês.", "Não incluir a mudança de transporte."),
+            checklist = listOf("Pesquisei 5 anúncios reais", "Estimei as contas da casa", "Montei uma lista de mercado com preços", "Somei transporte", "Acrescentei folga"),
+            related = listOf("estou-pronto", "custos-alem-aluguel", "orcamento-mensal"),
+        ),
+        Guide(
+            "reserva-antes", "preparo", "Dinheiro", "Como montar uma reserva financeira antes de sair", "🐷", 4, FACIL,
+            problem = "Imprevistos não esperam você se organizar: chuveiro queima, celular quebra, o freela atrasa. Uma reserva evita que um problema pequeno vire dívida.",
+            steps = listOf(
+                "Separe duas metas: o custo inicial da mudança e a reserva de emergência. Uma não substitui a outra.",
+                "Defina um valor fixo para guardar todo mês, logo que o dinheiro entrar — e não o que sobrar no fim do mês.",
+                "Guarde em uma conta ou aplicação separada, de baixo risco e que permita resgatar rápido.",
+                "Comece com a meta de um mês do seu custo de vida e, depois, avance para três a seis meses.",
+                "Só use a reserva para emergência real. Se usar, faça um plano para repor.",
+            ),
+            example = "Exemplo: custo de vida estimado de R$ 2.500. Primeira meta: R$ 2.500 (1 mês). Guardando R$ 300 por mês, leva cerca de 9 meses — e já protege bastante.",
+            mistakes = listOf("Misturar a reserva com o dinheiro do dia a dia.", "Usar a reserva para compras planejadas (isso é meta, não emergência).", "Desistir porque o valor guardado parece pequeno."),
+            checklist = listOf("Criei a meta da reserva no app", "Escolhi onde guardar", "Defini o valor mensal", "Automatizei ou agendei o depósito"),
+            related = listOf("reserva-emergencia", "plano-sem-pressa"),
+        ),
+        Guide(
+            "antes-de-procurar", "preparo", "Planejamento", "O que resolver antes de procurar um imóvel", "📋", 4, MEDIO,
+            problem = "Procurar imóvel sem saber quanto pode pagar ou que garantia vai usar faz você perder tempo, se frustrar e até perder boas oportunidades.",
+            steps = listOf(
+                "Defina o valor máximo de aluguel + condomínio + IPTU que cabe no seu orçamento.",
+                "Escolha 2 ou 3 bairros considerando transporte, segurança e serviços por perto.",
+                "Decida que tipo de garantia você consegue oferecer: caução, fiador, seguro-fiança ou título de capitalização.",
+                "Separe documentos e comprovantes de renda (holerite, extratos, declaração de imposto de renda ou de autônomo).",
+                "Tenha o dinheiro do custo inicial guardado ou quase completo.",
+                "Liste o que é obrigatório para você (aceitar pet, ter área de serviço, andar baixo) e o que é desejável.",
+            ),
+            mistakes = listOf("Visitar imóveis acima do orçamento \"só para ver\" e se apegar.", "Descobrir a exigência de fiador só na hora de fechar.", "Não checar o tempo de deslocamento no horário de pico."),
+            checklist = listOf("Defini meu teto de valor", "Escolhi bairros", "Sei qual garantia vou usar", "Documentos separados", "Lista de obrigatórios pronta"),
+            related = listOf("procurar-imovel", "contrato-garantias", "organizar-documentos"),
+        ),
+        Guide(
+            "conversar-familia", "preparo", "Relações", "Como conversar com a família sobre a mudança", "💬", 4, FACIL,
+            problem = "Para algumas famílias, a mudança é motivo de festa; para outras, gera preocupação, tristeza ou até impacto no orçamento da casa. Uma conversa bem feita evita mal-entendidos.",
+            steps = listOf(
+                "Escolha um momento tranquilo, sem pressa e sem plateia.",
+                "Conte o plano com números: quanto vai custar, quanto já guardou e qual a data aproximada. Isso mostra responsabilidade.",
+                "Explique o motivo em primeira pessoa (\"eu quero aprender a me virar\") em vez de reclamar da casa atual.",
+                "Escute as preocupações e responda com calma. Se alguém depende da sua contribuição financeira, combinem uma transição.",
+                "Combine como vocês vão manter contato e se ajudar depois da mudança.",
+            ),
+            mistakes = listOf("Anunciar a mudança no meio de uma briga.", "Esconder o plano até a véspera.", "Ignorar que sua saída pode mudar as contas da casa."),
+            checklist = listOf("Organizei meus números antes", "Escolhi um bom momento", "Ouvi as preocupações", "Combinamos a transição"),
+            related = listOf("planejar-saida", "estou-pronto"),
+        ),
+        Guide(
+            "ainda-nao-ganho", "preparo", "Dinheiro", "O que fazer se ainda não ganho o suficiente para sair", "🌱", 4, FACIL,
+            problem = "Descobrir que as contas não fecham é frustrante, mas não é o fim do plano. Existem caminhos — e o tempo de espera pode ser usado a seu favor.",
+            steps = listOf(
+                "Calcule exatamente quanto falta por mês para fechar a conta. Saber o número tira o peso do \"nunca vai dar\".",
+                "Considere dividir a casa: dividir aluguel e contas pode reduzir bastante o custo mensal.",
+                "Avalie bairros ou tipos de imóvel mais baratos (kitnet, quarto em casa compartilhada, imóvel mais longe com bom transporte).",
+                "Use o tempo de espera para juntar o custo inicial e a reserva: você vai sair mais seguro(a).",
+                "Se fizer sentido para você, busque aumentar a renda com qualificação ou trabalho extra, sem comprometer descanso e saúde.",
+            ),
+            example = "Exemplo: falta R$ 400 por mês para morar sozinho. Dividindo com mais uma pessoa, o aluguel e as contas caem pela metade e a conta pode fechar com folga.",
+            mistakes = listOf("Sair mesmo assim e cobrir a diferença com cartão de crédito.", "Achar que esperar é fracassar.", "Comparar seu tempo com o de outras pessoas."),
+            checklist = listOf("Sei quanto falta por mês", "Simulei dividir casa", "Pesquisei opções mais baratas", "Defini uma meta para o tempo de espera"),
+            related = listOf("plano-sem-pressa", "dividir-contas", "orcamento-nao-fecha"),
+        ),
+        Guide(
+            "plano-sem-pressa", "preparo", "Planejamento", "Como montar um plano de independência sem pressa", "🪜", 3, FACIL,
+            problem = "Independência é um processo, não um dia. Um plano em pequenos passos é mais fácil de cumprir do que uma meta gigante e distante.",
+            steps = listOf(
+                "Escreva onde você quer chegar (ex.: morar sozinho em um ano, ou organizar a casa onde já mora).",
+                "Quebre em fases curtas: números, dinheiro, habilidades da casa, imóvel, mudança.",
+                "Para cada fase, escolha no máximo 3 tarefas pequenas e concretas.",
+                "Use a jornada do app para acompanhar. Se a vida apertar, pause a jornada — sem culpa.",
+                "Comemore cada fase concluída e revise o plano quando algo mudar.",
+            ),
+            mistakes = listOf("Querer fazer tudo no mesmo mês.", "Abandonar o plano depois de um mês difícil.", "Copiar o plano de outra pessoa com outra realidade."),
+            checklist = listOf("Escrevi meu objetivo", "Dividi em fases", "Escolhi as 3 primeiras tarefas", "Marquei uma data para revisar"),
+            related = listOf("estou-pronto", "rotina-realista"),
+        ),
+    )
+}

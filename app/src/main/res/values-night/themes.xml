@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.CasaClara" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/noite</item>
+    </style>
+</resources>

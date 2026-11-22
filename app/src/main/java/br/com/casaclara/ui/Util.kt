@@ -1,0 +1,59 @@
+package br.com.casaclara.ui
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import br.com.casaclara.data.BillEntity
+import br.com.casaclara.data.HouseTaskEntity
+import br.com.casaclara.domain.Dates
+import br.com.casaclara.domain.Journey
+import br.com.casaclara.domain.JourneyState
+import br.com.casaclara.domain.Snapshot
+import br.com.casaclara.data.UserPrefs
+import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
+
+@Composable
+fun <T> Flow<T>.asState(initial: T): State<T> = collectAsStateWithLifecycle(initialValue = initial)
+
+val FREQ_LABEL = linkedMapOf("DIARIA" to "Diária", "SEMANAL" to "Semanal", "QUINZENAL" to "Quinzenal", "MENSAL" to "Mensal", "SEMESTRAL" to "Semestral")
+val FREQ_DAYS = mapOf("DIARIA" to 1L, "SEMANAL" to 7L, "QUINZENAL" to 15L, "MENSAL" to 30L, "SEMESTRAL" to 182L)
+
+data class BillStatus(val due: LocalDate, val days: Long, val paid: Boolean, val late: Boolean)
+
+fun billStatus(b: BillEntity, today: LocalDate = Dates.today()): BillStatus {
+    val month = Dates.monthKey(today)
+    val paid = b.paidMonth == month
+    val thisMonthDue = Dates.dueInMonth(b.dueDay, month)
+    val late = !paid && thisMonthDue.isBefore(today)
+    val due = when {
+        late -> thisMonthDue
+        paid -> Dates.dueInMonth(b.dueDay, Dates.shiftMonth(month, 1))
+        else -> Dates.nextMonthlyDue(b.dueDay, today)
+    }
+    return BillStatus(due, Dates.daysBetween(today, due), paid, late)
+}
+
+data class TaskStatus(val next: LocalDate, val days: Long, val late: Boolean, val never: Boolean)
+
+fun taskStatus(t: HouseTaskEntity, today: LocalDate = Dates.today()): TaskStatus {
+    val last = t.lastDone ?: return TaskStatus(today, 0, false, true)
+    val next = LocalDate.ofEpochDay(last + (FREQ_DAYS[t.frequency] ?: 7L))
+    val d = Dates.daysBetween(today, next)
+    return TaskStatus(next, d, d < 0, false)
+}
+
+fun journeyOf(s: Snapshot, p: UserPrefs): JourneyState = Journey.compute(s, p.situation, p.goal, p.manualSteps, p.skippedSteps)
+
+fun greeting(): String {
+    val h = java.time.LocalTime.now().hour
+    return when { h < 12 -> "Bom dia"; h < 18 -> "Boa tarde"; else -> "Boa noite" }
+}
+
+/** Categorias padrão. */
+val EXPENSE_CATEGORIES = listOf("Moradia", "Contas da casa", "Mercado", "Transporte", "Saúde", "Educação", "Lazer", "Roupas", "Casa e móveis", "Dívidas", "Assinaturas", "Pets", "Outros")
+val INCOME_CATEGORIES = listOf("Salário", "Freela", "Vendas", "Bico", "Benefício", "Mesada/ajuda", "Outros")
+val MARKET_CATEGORIES = listOf("Hortifrúti", "Grãos e massas", "Carnes e ovos", "Laticínios", "Padaria", "Bebidas", "Limpeza", "Higiene", "Congelados", "Temperos", "Outros")
+val ROOMS = listOf("Cozinha", "Banheiro", "Quarto", "Sala", "Área de serviço", "Varanda", "Casa toda")
+val WEEKDAYS = listOf("Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo")
+val MEAL_TYPES = listOf("Café da manhã", "Almoço", "Lanche", "Jantar")
