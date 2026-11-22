@@ -19,6 +19,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Chave de teste fixa: todo APK gerado pelo CI tem a mesma assinatura,
+    // então dá para atualizar o app por cima sem desinstalar (e sem perder dados).
+    signingConfigs {
+        getByName("debug") {
+            storeFile = rootProject.file("ci/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true

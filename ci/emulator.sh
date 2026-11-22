@@ -14,7 +14,7 @@ if [ -f old/app-debug.apk ]; then
   adb shell am force-stop $PKG
 fi
 echo "== Instalando versão nova por cima"
-adb install -r new/app-debug.apk
+adb install -r new/app-debug.apk || { echo "Falha ao instalar a versão nova por cima"; exit 1; }
 adb logcat -c
 adb shell am start -W -n $PKG/.MainActivity
 sleep 12
@@ -32,5 +32,5 @@ for f in $(adb shell run-as $PKG ls files/shots 2>/dev/null | tr -d '\r'); do
 done
 ls -la shots
 adb logcat -d | grep -E "FATAL EXCEPTION" -A 30 > crash.txt || true
-if grep -qE "FAILURES!!!|INSTRUMENTATION_FAILED|Process crashed" instrument.txt; then exit 1; fi
+if ! grep -q "^OK (" instrument.txt; then echo "O passeio de interface falhou"; exit 1; fi
 exit 0
