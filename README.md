@@ -106,3 +106,14 @@ app/src/main/java/br/com/casaclara/
 - Os lembretes usam WorkManager: o horário é aproximado (pode atrasar alguns minutos com economia de bateria).
 - A casa compartilhada funciona em um aparelho só, até existir backend.
 - O conteúdo é educativo e geral. Os guias de aluguel e de dívidas indicam conferir fontes oficiais.
+
+## Novidades da versão 2
+
+- **Início personalizável**: cartões (próximo passo, semana, mês com gráfico, contas, tarefas, cofrinhos, mercado, atalhos, dica, conquistas) que você reordena, esconde e combina com até 8 atalhos favoritos.
+- **Dinheiro**: cartões de crédito (fatura por fechamento/vencimento, parcelas, limite usado, "paguei"), lançamentos recorrentes automáticos, cofrinhos com guardar/retirar/transferir e histórico, importação de extrato CSV (detecção de colunas, categoria sugerida, aviso de duplicados).
+- **Casa e rotina**: plano da semana que distribui tarefas, faxina cronometrada com notificação, compartilhar lista de mercado/plano pelo WhatsApp, widget de tela inicial.
+- **Visual cartunesco**: fontes Baloo 2 + Nunito (OFL), contornos e sombras deslocadas, ilustrações vetoriais próprias.
+- **Desempenho e compatibilidade**: Android 8.0+ (API 26), emojis embutidos (sem "quadradinhos" no Android 8), splash screen, listas paginadas, banco v2 com migração automática (não perde dados).
+- **Testes**: testes de domínio (JVM) + passeio automatizado em emulador Android 8 e Android 14 no GitHub Actions, incluindo atualização da v1 para a v2.
+
+Baixe o APK: https://github.com/AdryanAndson/CasaClara/releases/download/apk/CasaClara.apk
