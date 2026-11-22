@@ -1,5 +1,11 @@
 package br.com.casaclara.ui.screens
 
+import androidx.compose.ui.unit.sp
+
+import androidx.compose.foundation.layout.fillMaxHeight
+
+import androidx.compose.foundation.layout.IntrinsicSize
+
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -328,12 +334,17 @@ private fun ShortcutsCard(d: HomeData, nav: NavController, planning: Boolean) {
     val tools = ids.mapNotNull { id -> Tools.ALL.firstOrNull { it.id == id } }
     BrandCard {
         CardTitle("🚀", "Atalhos", "Editar") { nav.navigate(Routes.CUSTOMIZE) }
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            tools.forEach { t ->
-                BrandCard(Modifier.width(98.dp), tone = Tone.AMARELO, onClick = { nav.navigate(t.route) }, padding = 8.dp) {
-                    Text(t.emoji, style = MaterialTheme.typography.headlineSmall)
-                    Text(t.label, style = MaterialTheme.typography.labelMedium, maxLines = 2)
+        // grade de 3 colunas com a mesma largura; palavras longas diminuem a letra em vez de quebrar no meio
+        tools.chunked(3).forEach { rowTools ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+                rowTools.forEach { t ->
+                    val longWord = t.label.split(' ').maxOf { it.length }
+                    BrandCard(Modifier.weight(1f).fillMaxHeight(), tone = Tone.AMARELO, onClick = { nav.navigate(t.route) }, padding = 8.dp) {
+                        Text(t.emoji, style = MaterialTheme.typography.headlineSmall)
+                        Text(t.label, style = MaterialTheme.typography.labelMedium, fontSize = if (longWord > 10) 11.sp else if (longWord > 8) 12.sp else 13.sp, maxLines = 2, lineHeight = 15.sp)
+                    }
                 }
+                repeat(3 - rowTools.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
