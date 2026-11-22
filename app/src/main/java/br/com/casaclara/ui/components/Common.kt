@@ -62,6 +62,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import br.com.casaclara.ui.theme.BigNumber
 import br.com.casaclara.ui.theme.Brand
 import br.com.casaclara.ui.theme.LocalSoft
@@ -205,7 +206,9 @@ fun DemoTag(show: Boolean) { if (show) Tag("demo", Tone.AMARELO) }
 fun Stat(label: String, value: String, modifier: Modifier = Modifier, color: Color? = null) {
     Column(modifier) {
         Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(value, style = BigNumber, color = color ?: MaterialTheme.colorScheme.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        // valores longos (R$ 12.345,67) diminuem um pouco em vez de serem cortados
+        val size = when { value.length > 14 -> 20.sp; value.length > 12 -> 23.sp; value.length > 10 -> 25.sp; else -> BigNumber.fontSize }
+        Text(value, style = BigNumber.copy(fontSize = size), color = color ?: MaterialTheme.colorScheme.onSurface, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
     }
 }
 

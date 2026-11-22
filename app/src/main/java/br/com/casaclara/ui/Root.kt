@@ -1,5 +1,11 @@
 package br.com.casaclara.ui
 
+import br.com.casaclara.ui.components.cartoonShadow
+
+import androidx.compose.foundation.clickable
+
+import kotlinx.coroutines.flow.debounce
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -129,6 +135,7 @@ fun CasaClaraRoot(c: AppContainer) {
     CasaClaraTheme(p.theme, p.textScale) { AppContent(c, p) }
 }
 
+@OptIn(kotlinx.coroutines.FlowPreview::class)
 @Composable
 private fun AppContent(c: AppContainer, p: UserPrefs) {
     val nav = rememberNavController()
@@ -145,15 +152,16 @@ private fun AppContent(c: AppContainer, p: UserPrefs) {
 
     // Conquistas: verifica a cada mudança nos dados e comemora as novas (a primeira leitura só registra).
     LaunchedEffect(Unit) {
-        c.snapshot.collect { s ->
+        // debounce: várias mudanças seguidas (ex.: dados de exemplo) viram um único aviso
+        c.snapshot.debounce(1_200).collect { s ->
             val novas = c.checkAchievements(s)
-            novas.firstOrNull()?.let { id ->
-                val a = Achievements.ALL.first { it.id == id }
-                feedback.celebrate("Conquista desbloqueada: ${a.emoji} ${a.title}")
+            when {
+                novas.size == 1 -> Achievements.ALL.firstOrNull { it.id == novas[0] }?.let { feedback.celebrate("Conquista: ${it.emoji} ${it.title}") }
+                novas.size > 1 -> feedback.celebrate("${novas.size} conquistas desbloqueadas! 🏆")
             }
         }
     }
-    LaunchedEffect(toast) { if (toast != null) { delay(3200); toast = null } }
+    LaunchedEffect(toast) { val t = toast ?: return@LaunchedEffect; delay((2200L + t.text.length * 25L).coerceAtMost(4500L)); toast = null }
     LaunchedEffect(Unit) { runCatching { c.runRecurring() } }
 
     val back by nav.currentBackStackEntryAsState()
@@ -207,7 +215,7 @@ private fun AppContent(c: AppContainer, p: UserPrefs) {
                 }
             }
             if (confettiKey != 0L) Confetti(confettiKey)
-            ToastHost(toast, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = if (showBottom) 88.dp else 16.dp, start = 16.dp, end = 16.dp))
+            ToastHost(toast, { toast = null }, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = if (showBottom) 88.dp else 16.dp, start = 16.dp, end = 16.dp))
             ConfirmHost(confirm)
         }
     }
@@ -239,17 +247,17 @@ private fun BottomBar(nav: NavHostController, route: String) {
 }
 
 @Composable
-private fun ToastHost(t: Toast?, modifier: Modifier) {
+private fun ToastHost(t: Toast?, onDismiss: () -> Unit, modifier: Modifier) {
     AnimatedVisibility(t != null, modifier = modifier, enter = slideInVertically { it } + fadeIn(), exit = slideOutVertically { it } + fadeOut()) {
         val shown = t ?: return@AnimatedVisibility
         Card(
             shape = RoundedCornerShape(18.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = BorderStroke(2.dp, LocalSoft.current.contorno),
-            modifier = Modifier.widthIn(max = 520.dp).semantics { liveRegion = LiveRegionMode.Polite },
+            modifier = Modifier.widthIn(max = 520.dp).cartoonShadow(LocalSoft.current.contorno, 18.dp).clickable(onClick = onDismiss).semantics { liveRegion = LiveRegionMode.Polite },
         ) {
             Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Mascot(shown.mood, 44.dp, describe = false)
+                Mascot(shown.mood, 36.dp, describe = false)
                 Spacer(Modifier.width(8.dp))
                 Text(shown.text, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, modifier = Modifier.padding(end = 8.dp))
             }

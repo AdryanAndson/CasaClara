@@ -7,14 +7,14 @@ plugins {
 
 android {
     namespace = "br.com.casaclara"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "br.com.casaclara"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        targetSdk = 36
+        versionCode = 300
+        versionName = "3.0.0"
         vectorDrawables { useSupportLibrary = true }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -35,8 +35,8 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // Para publicar, configure sua própria chave em signingConfigs.
-            // Assim o "assembleRelease" gera um APK não assinado; use "assembleDebug" para testar.
+            // Sem chave aqui de propósito: o .aab sai sem assinatura e é assinado fora do repositório
+            // com a chave de upload da Play Store (jarsigner). Nunca coloque a chave neste repositório público.
         }
     }
     compileOptions {
@@ -45,6 +45,12 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
+    bundle {
+        language { enableSplit = false } // app só em português; mantém todos os textos juntos
+    }
+    packaging {
+        resources { excludes += setOf("/META-INF/{AL2.0,LGPL2.1}", "DebugProbesKt.bin", "kotlin-tooling-metadata.json") }
+    }
 }
 
 ksp {
@@ -70,6 +76,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.emoji2.bundled)
+    implementation(libs.androidx.profileinstaller)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)

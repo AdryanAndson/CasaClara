@@ -46,7 +46,7 @@ private val Light = lightColorScheme(
     secondary = Brand.Azul, onSecondary = Color.White, secondaryContainer = Color(0xFFDFE9FF), onSecondaryContainer = Brand.Tinta,
     tertiary = Brand.CoralEscuro, onTertiary = Color.White, tertiaryContainer = Color(0xFFFFE2DE), onTertiaryContainer = Brand.Tinta,
     background = Brand.Papel, onBackground = Brand.Tinta, surface = Color.White, onSurface = Brand.Tinta,
-    surfaceVariant = Color(0xFFF4EEDF), onSurfaceVariant = Color(0xFF4A5A68), outline = Brand.Tinta, outlineVariant = Color(0xFFE2D9C6),
+    surfaceVariant = Color(0xFFF4EEDF), onSurfaceVariant = Color(0xFF3D4B58), outline = Brand.Tinta, outlineVariant = Color(0xFFE2D9C6),
     error = Color(0xFFB3261E), onError = Color.White, surfaceContainer = Color(0xFFFFF7E8), surfaceContainerHigh = Color(0xFFFFF3DF),
 )
 private val Dark = darkColorScheme(
@@ -66,7 +66,7 @@ val Nunito = FontFamily(
 )
 
 private val AppTypography = Typography().let { t ->
-    fun TextStyle.body() = copy(fontFamily = Nunito)
+    fun TextStyle.body() = copy(fontFamily = Nunito, letterSpacing = 0.1.sp)
     fun TextStyle.head(w: FontWeight) = copy(fontFamily = Baloo, fontWeight = w, letterSpacing = 0.sp)
     t.copy(
         displayLarge = t.displayLarge.head(FontWeight.ExtraBold), displayMedium = t.displayMedium.head(FontWeight.ExtraBold), displaySmall = t.displaySmall.head(FontWeight.ExtraBold),
@@ -76,15 +76,17 @@ private val AppTypography = Typography().let { t ->
         titleLarge = t.titleLarge.head(FontWeight.ExtraBold).copy(fontSize = 21.sp, lineHeight = 26.sp),
         titleMedium = t.titleMedium.copy(fontFamily = Nunito, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp),
         titleSmall = t.titleSmall.copy(fontFamily = Nunito, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp),
-        bodyLarge = t.bodyLarge.body().copy(fontSize = 17.sp, lineHeight = 25.sp),
+        bodyLarge = t.bodyLarge.body().copy(fontSize = 17.sp, lineHeight = 25.sp, letterSpacing = 0.15.sp),
         bodyMedium = t.bodyMedium.body().copy(fontSize = 15.sp, lineHeight = 22.sp),
-        bodySmall = t.bodySmall.body().copy(fontSize = 13.sp, lineHeight = 18.sp),
+        bodySmall = t.bodySmall.body().copy(fontSize = 14.sp, lineHeight = 20.sp),
         labelLarge = t.labelLarge.copy(fontFamily = Nunito, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp),
         labelMedium = t.labelMedium.copy(fontFamily = Nunito, fontWeight = FontWeight.Bold),
-        labelSmall = t.labelSmall.copy(fontFamily = Nunito, fontWeight = FontWeight.Bold),
+        labelSmall = t.labelSmall.copy(fontFamily = Nunito, fontWeight = FontWeight.Bold, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.2.sp),
+        labelMedium = t.labelMedium.copy(fontFamily = Nunito, fontWeight = FontWeight.Bold, fontSize = 13.sp, letterSpacing = 0.15.sp),
     )
 }
-val BigNumber = TextStyle(fontFamily = Baloo, fontWeight = FontWeight.ExtraBold, fontSize = 28.sp, lineHeight = 32.sp)
+/** Números grandes: dígitos com a mesma largura (tnum) para valores alinhados e sem "pular" ao mudar. */
+val BigNumber = TextStyle(fontFamily = Baloo, fontWeight = FontWeight.ExtraBold, fontSize = 28.sp, lineHeight = 32.sp, fontFeatureSettings = "tnum")
 
 @Composable
 fun CasaClaraTheme(mode: ThemeMode, textScale: Float, content: @Composable () -> Unit) {

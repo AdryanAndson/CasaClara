@@ -88,6 +88,11 @@ class TourTest {
             tap("Dicas e guias"); shot("biblioteca")
             tap("Golpes e segurança digital", substring = true); shot("categoria")
             tap("Golpes com Pix: como reconhecer e se proteger"); shot("guia")
+            back(); back()
+            tap("Mais"); tap("Configurações"); tap("Escuro"); shot("config-escuro"); back()
+            tap("Início"); Thread.sleep(800); shot("escuro-inicio")
+            tap("Finanças"); shot("escuro-financas")
+            tap("Casa"); shot("escuro-casa")
         }
     }
 }

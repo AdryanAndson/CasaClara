@@ -33,4 +33,27 @@ done
 ls -la shots
 adb logcat -d | grep -E "FATAL EXCEPTION" -A 30 > crash.txt || true
 if ! grep -q "^OK (" instrument.txt; then echo "O passeio de interface falhou"; exit 1; fi
+
+# Tempo de abertura (debug) para comparação
+adb shell am force-stop $PKG
+echo "debug: $(adb shell am start -W -n $PKG/.MainActivity | grep TotalTime)" | tee shots/timing.txt
+
+if [ -f new/app-release.apk ]; then
+  echo "== Versão de publicação (R8/minificada): instalação, abertura e teste de estresse"
+  adb uninstall $PKG >/dev/null
+  adb install new/app-release.apk || { echo "Falha ao instalar a versão de publicação"; exit 1; }
+  adb logcat -c
+  adb shell am start -W -n $PKG/.MainActivity > /dev/null; sleep 6; adb shell am force-stop $PKG; sleep 2
+  for i in 1 2 3; do
+    echo "release frio $i: $(adb shell am start -W -n $PKG/.MainActivity | grep TotalTime)" | tee -a shots/timing.txt
+    sleep 4; adb shell am force-stop $PKG; sleep 2
+  done
+  adb shell am start -W -n $PKG/.MainActivity > /dev/null; sleep 4
+  adb shell monkey -p $PKG --pct-syskeys 0 --pct-appswitch 0 --throttle 120 -s 7 800 > shots/monkey.txt 2>&1 || true
+  sleep 3
+  adb exec-out screencap -p > shots/99-release.png || true
+  if adb logcat -d | grep -E "FATAL EXCEPTION|ANR in $PKG" -A 40 > shots/release-crash.txt; then
+    echo "A versão de publicação travou"; cat shots/release-crash.txt | head -80; exit 1
+  fi
+fi
 exit 0

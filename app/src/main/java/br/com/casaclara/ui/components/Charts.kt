@@ -1,5 +1,9 @@
 package br.com.casaclara.ui.components
 
+import androidx.compose.foundation.layout.widthIn
+
+import androidx.compose.ui.unit.sp
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -63,7 +67,9 @@ fun Donut(data: List<Pair<String, Long>>, format: (Long) -> String, center: Stri
                 drawCircle(ink, this.size.minDimension / 2 - w - 4f, style = Stroke(4f))
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(center, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, maxLines = 1)
+                val fs = when { center.length > 11 -> 12.sp; center.length > 9 -> 13.sp; center.length > 7 -> 15.sp; else -> 18.sp }
+                Text(center, style = MaterialTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"), fontSize = fs, fontWeight = FontWeight.Black, maxLines = 1, softWrap = false,
+                    modifier = Modifier.widthIn(max = size * 0.52f))
                 Text(centerLabel, style = MaterialTheme.typography.labelSmall)
             }
         }

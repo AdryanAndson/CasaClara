@@ -20,13 +20,25 @@ jobs:
         run: |
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           chmod +x gradlew
-          ./gradlew testDebugUnitTest assembleDebug assembleDebugAndroidTest --stacktrace
+          ./gradlew testDebugUnitTest assembleDebug assembleDebugAndroidTest assembleRelease bundleRelease --stacktrace
+          # APK de publicação assinado só com a chave de TESTE, para rodar no emulador.
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          $BT/apksigner sign --ks ci/debug.keystore --ks-pass pass:android --ks-key-alias androiddebugkey --key-pass pass:android \
+            --out app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/app-release-unsigned.apk
+          ls -la app/build/outputs/apk/release app/build/outputs/bundle/release
       - uses: actions/upload-artifact@v4
         with:
           name: new
           path: |
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            app/build/outputs/apk/release/app-release.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: play
+          path: |
+            app/build/outputs/bundle/release/app-release.aab
+            app/build/outputs/mapping/release/mapping.txt
 
   build-old:
     runs-on: ubuntu-latest
@@ -55,7 +67,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [26, 34]
+        api: [26, 36]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -99,10 +111,16 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with: { name: new, path: new-raw }
+      - uses: actions/download-artifact@v4
+        with: { name: play, path: play }
       - name: Publicar APK para download
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           cp $(find new-raw -name app-debug.apk) CasaClara.apk
           gh release delete apk --yes --cleanup-tag -R ${{ github.repository }} || true
-          gh release create apk CasaClara.apk -R ${{ github.repository }} --title "Casa Clara — APK de teste" --notes "APK de teste gerado automaticamente e testado em emulador (Android 8 e 14). Baixe no celular e instale (permita instalar apps desconhecidos)." --target "$GITHUB_SHA"
+          gh release create apk CasaClara.apk -R ${{ github.repository }} --title "Casa Clara — APK de teste" --notes "APK de teste gerado automaticamente e testado em emulador (Android 8 e 16). Baixe no celular e instale (permita instalar apps desconhecidos)." --target "$GITHUB_SHA"
+          cp $(find play -name app-release.aab) CasaClara-unsigned.aab
+          cp $(find play -name mapping.txt) mapping.txt
+          gh release delete play-build --yes --cleanup-tag -R ${{ github.repository }} || true
+          gh release create play-build CasaClara-unsigned.aab mapping.txt -R ${{ github.repository }} --prerelease --title "Pacote para a Play Store (sem assinatura)" --notes "Pacote .aab SEM assinatura. Precisa ser assinado com a chave de upload antes de enviar à Play Store." --target "$GITHUB_SHA"
