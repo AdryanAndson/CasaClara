@@ -67,7 +67,7 @@ class TourTest {
             repeat(5) { tap("Pular esta pergunta") }
             shot("jornada-pronta")
             tap("Explorar com dados de exemplo")
-            Thread.sleep(2500)
+            Thread.sleep(7000) // espera o aviso de conquistas sumir
             shot("inicio"); scrollDown(); shot("inicio-2"); scrollDown(); shot("inicio-3"); scrollDown(); shot("inicio-4")
             tap("Jornada"); shot("jornada")
             tap("Finanças"); shot("financas"); scrollDown(); shot("financas-2")

@@ -186,10 +186,15 @@ private fun ForecastCard(tx: List<TxEntity>, recs: List<RecurringEntity>, bills:
     BrandCard(tone = if (r.previsto >= 0) Tone.AZUL else Tone.CORAL, padding = 12.dp) {
         Text("🔮 Previsão para o fim do mês", style = MaterialTheme.typography.titleMedium)
         Stat("Deve sobrar", Money.format(r.previsto), color = if (r.previsto < 0) MaterialTheme.colorScheme.error else Brand.VerdeEscuro)
-        Text("Saldo hoje ${Money.format(r.saldoAgora)}" +
-            (if (r.entradasPrevistas > 0) " + a receber ${Money.format(r.entradasPrevistas)}" else "") +
-            (if (r.fixosPrevistos + r.contasAPagar > 0) " − fixos e contas ${Money.format(r.fixosPrevistos + r.contasAPagar)}" else "") +
-            " − dia a dia ${Money.format(r.variavelRestante)} (${Money.format(r.gastoVariavelPorDia)}/dia × ${r.diasRestantes} dias).", style = MaterialTheme.typography.bodySmall)
+        @Composable fun line(l: String, v: String) = Row(Modifier.fillMaxWidth()) {
+            Text(l, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
+            Text(v, style = MaterialTheme.typography.bodySmall.copy(fontFeatureSettings = "tnum"), fontWeight = FontWeight.Bold)
+        }
+        line("Saldo de hoje", Money.format(r.saldoAgora))
+        if (r.entradasPrevistas > 0) line("+ Ainda vai entrar", Money.format(r.entradasPrevistas))
+        if (r.fixosPrevistos + r.contasAPagar > 0) line("− Fixos e contas a pagar", Money.format(r.fixosPrevistos + r.contasAPagar))
+        line("− Gastos do dia a dia (${r.diasRestantes} dias)", Money.format(r.variavelRestante))
+        Text("Ritmo atual: ${Money.format(r.gastoVariavelPorDia)} por dia em gastos do dia a dia.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (r.previsto < 0) Text("No ritmo atual, o mês fecha no vermelho. Segurar ${Money.format(-r.previsto / r.diasRestantes.coerceAtLeast(1))} por dia resolve.", fontWeight = FontWeight.Bold)
     }
 }

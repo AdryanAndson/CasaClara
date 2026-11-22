@@ -273,7 +273,10 @@ fun ItemRow(
         colors = CardDefaults.cardColors(containerColor = if (done) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface),
         border = BorderStroke(2.dp, ink),
     ) {
-        Row(Modifier.padding(horizontal = 8.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        // Com muitas ações (ex.: Feito + editar + excluir), elas vão para uma linha embaixo
+        // para o título não ficar espremido em várias linhas.
+        val wide = extra != null && (onEdit != null || onDelete != null)
+        Row(Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = if (wide) 0.dp else 8.dp), verticalAlignment = Alignment.CenterVertically) {
             if (checked != null) Checkbox(checked = checked, onCheckedChange = onCheck, modifier = Modifier.semantics { contentDescription = (if (done) "Desmarcar " else "Marcar ") + title })
             leading?.invoke()
             Column(Modifier.weight(1f).padding(start = if (checked == null && leading == null) 8.dp else 4.dp)) {
@@ -285,7 +288,14 @@ fun ItemRow(
                 if (!subtitle.isNullOrBlank()) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (tags != null) FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 4.dp)) { tags() }
             }
-            if (amount != null) Text(amount, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Black, modifier = Modifier.padding(horizontal = 4.dp))
+            if (amount != null) Text(amount, style = MaterialTheme.typography.titleSmall.copy(fontFeatureSettings = "tnum"), fontWeight = FontWeight.Black, maxLines = 1, softWrap = false, modifier = Modifier.padding(horizontal = 4.dp))
+            if (!wide) {
+                extra?.invoke(this)
+                if (onEdit != null) IconButton(onClick = onEdit) { Icon(Icons.Filled.Edit, contentDescription = "Editar $itemLabel") }
+                if (onDelete != null) IconButton(onClick = onDelete) { Icon(Icons.Filled.Delete, contentDescription = "Excluir $itemLabel") }
+            }
+        }
+        if (wide) Row(Modifier.fillMaxWidth().padding(start = 8.dp, end = 4.dp, bottom = 2.dp), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
             extra?.invoke(this)
             if (onEdit != null) IconButton(onClick = onEdit) { Icon(Icons.Filled.Edit, contentDescription = "Editar $itemLabel") }
             if (onDelete != null) IconButton(onClick = onDelete) { Icon(Icons.Filled.Delete, contentDescription = "Excluir $itemLabel") }

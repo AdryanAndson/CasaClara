@@ -148,8 +148,8 @@ fun OnboardingScreen(c: AppContainer, onDone: (String) -> Unit) {
             Modifier.widthIn(max = 640.dp).fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            ProgressLine((i + 1f) / steps.size, "Passo ${i + 1} de ${steps.size}")
-            Text("Passo ${i + 1} de ${steps.size}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            ProgressLine((i + 1f) / steps.size, "Passo ${i + 1}")
+            Text(if (i == steps.lastIndex) "Último passo" else "Passo ${i + 1}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Row(verticalAlignment = Alignment.Bottom) {
                 Mascot(mood, 110.dp)
                 Spacer(Modifier.width(8.dp))

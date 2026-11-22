@@ -229,7 +229,7 @@ fun SettingsScreen(c: AppContainer, nav: NavController) {
         Text("Tema", fontWeight = FontWeight.Bold)
         ThemeMode.values().forEach { t ->
             Row(Modifier.fillMaxWidth().selectable(p.theme == t, role = Role.RadioButton) { scope.launch { c.prefs.update { it.copy(theme = t) } } }, verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(selected = p.theme == t, onClick = null); Text(t.label)
+                RadioButton(selected = p.theme == t, onClick = null); Spacer(Modifier.width(8.dp)); Text(t.label)
             }
         }
         Text("Tamanho do texto: ${(p.textScale * 100).toInt()}%", fontWeight = FontWeight.Bold)
@@ -255,7 +255,7 @@ fun SettingsScreen(c: AppContainer, nav: NavController) {
         Text("Estilo das letras", fontWeight = FontWeight.Bold)
         listOf(false to "Divertidas (Baloo e Nunito)", true to "Clássicas (as do seu celular, mais sóbrias)").forEach { (v, l) ->
             Row(Modifier.fillMaxWidth().selectable(st.classicFont == v, role = Role.RadioButton) { set("classicFont", v) }, verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(selected = st.classicFont == v, onClick = null); Text(l)
+                RadioButton(selected = st.classicFont == v, onClick = null); Spacer(Modifier.width(8.dp)); Text(l)
             }
         }
         SettingSwitch("Modo simples", "Esconde a aba Jornada e deixa o Início só com o essencial.", st.simpleMode) { set("simpleMode", it) }

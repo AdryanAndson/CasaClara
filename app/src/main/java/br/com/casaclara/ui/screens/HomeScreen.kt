@@ -357,13 +357,15 @@ private fun ShortcutsCard(d: HomeData, nav: NavController, planning: Boolean) {
     BrandCard {
         CardTitle("🚀", "Atalhos", "Editar") { nav.navigate(Routes.CUSTOMIZE) }
         // grade de 3 colunas com a mesma largura; palavras longas diminuem a letra em vez de quebrar no meio
+        // um só tamanho de letra para todos os atalhos (definido pela palavra mais longa)
+        val longest = tools.flatMap { it.label.split(' ') }.maxOfOrNull { it.length } ?: 0
+        val labelSize = if (longest > 10) 11.5.sp else if (longest > 8) 12.5.sp else 13.sp
         tools.chunked(3).forEach { rowTools ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                 rowTools.forEach { t ->
-                    val longWord = t.label.split(' ').maxOf { it.length }
                     BrandCard(Modifier.weight(1f).fillMaxHeight(), tone = Tone.AMARELO, onClick = { nav.navigate(t.route) }, padding = 8.dp) {
                         Text(t.emoji, style = MaterialTheme.typography.headlineSmall)
-                        Text(t.label, style = MaterialTheme.typography.labelMedium, fontSize = if (longWord > 10) 11.sp else if (longWord > 8) 12.sp else 13.sp, maxLines = 2, lineHeight = 15.sp)
+                        Text(t.label, style = MaterialTheme.typography.labelMedium, fontSize = labelSize, maxLines = 2, lineHeight = 15.sp)
                     }
                 }
                 repeat(3 - rowTools.size) { Spacer(Modifier.weight(1f)) }

@@ -291,8 +291,8 @@ fun ScamScreen(c: AppContainer, nav: NavController) {
             Text(when (level) { ScamCheck.Level.ALTO -> "🚨 "; ScamCheck.Level.ATENCAO -> "⚠️ "; else -> "✅ " } + level.label, style = MaterialTheme.typography.titleLarge)
             ProgressLine((ScamCheck.score(chosen) / 8f).coerceAtMost(1f), "Nível de risco", when (level) { ScamCheck.Level.ALTO -> Brand.Coral; ScamCheck.Level.ATENCAO -> Brand.Amarelo; else -> Brand.Verde })
             Text(when (level) {
-                ScamCheck.Level.ALTO -> "Tem sinais fortes de golpe. Não pague, não clique e não passe nenhum código."
-                ScamCheck.Level.ATENCAO -> "Há sinais que merecem cuidado. Confirme por outro caminho antes de fazer qualquer coisa."
+                ScamCheck.Level.ALTO -> "Suas respostas têm sinais fortes de golpe. Faça assim:"
+                ScamCheck.Level.ATENCAO -> "Há sinais que merecem cuidado. Antes de qualquer coisa:"
                 else -> "Poucos sinais de golpe nas suas respostas. Mesmo assim, na dúvida, confirme pelo canal oficial."
             })
             if (level != ScamCheck.Level.BAIXO) ScamCheck.WHAT_TO_DO.forEach { Text("• $it", style = MaterialTheme.typography.bodyMedium) }
