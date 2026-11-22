@@ -25,6 +25,12 @@ private data class Entry(val emoji: String, val title: String, val sub: String, 
 @Composable
 fun MoreScreen(@Suppress("UNUSED_PARAMETER") c: AppContainer, nav: NavController) {
     val groups = listOf(
+        "Ajuda rápida" to listOf(
+            Entry("🆘", "Emergência", "Números úteis e seu cartão de emergência", Routes.EMERGENCY),
+            Entry("🛡️", "É golpe?", "Detector de golpe para mensagens e ligações", Routes.GOLPE),
+            Entry("🪪", "Documentos e validades", "Avisos antes de vencer CNH, contrato, seguro", Routes.DOCS),
+            Entry("💡", "Consumo de luz, água e gás", "Leitura do medidor e conta estimada", Routes.CONSUMO),
+        ),
         "Ferramentas" to listOf(
             Entry("📦", "Mudança e aluguel", "Checklist, cronograma, documentos, imóveis", Routes.moving(0)),
             Entry("🛒", "Mercado e alimentação", "Lista, favoritos, cardápio, despensa, receitas", Routes.market(0)),
@@ -33,12 +39,13 @@ fun MoreScreen(@Suppress("UNUSED_PARAMETER") c: AppContainer, nav: NavController
             Entry("🗓️", "Plano da semana", "Tarefas distribuídas pelos dias", Routes.WEEKPLAN),
             Entry("⏱️", "Faxina cronometrada", "Escolha um cômodo e um tempo", Routes.TIMER),
             Entry("📥", "Importar extrato", "Traga lançamentos do banco (CSV)", Routes.IMPORT),
-            Entry("🧮", "Calculadoras", "Custo de vida, mudança, renda, metas, transporte", Routes.CALCULATORS),
+            Entry("🧮", "Calculadoras", "Custo de vida, salário líquido, férias, 13º e mais", Routes.CALCULATORS),
             Entry("📇", "Contatos e emergência", "Profissionais, emergência, endereços importantes", Routes.CONTACTS),
             Entry("🔔", "Lembretes", "Contas, tarefas, metas, mudança, manutenção", Routes.REMINDERS),
         ),
         "Aprender" to listOf(
-            Entry("📚", "Dicas e guias", "100 guias práticos com busca e favoritos", Routes.LIBRARY),
+            Entry("📚", "Dicas e guias", "${br.com.casaclara.domain.content.Library.GUIDES.size} guias práticos com busca e favoritos", Routes.LIBRARY),
+            Entry("🧠", "Teste rápido", "10 perguntas para testar o que você sabe", Routes.QUIZ),
             Entry("🏆", "Conquistas", "O que você já conquistou de verdade", Routes.ACHIEVEMENTS),
             Entry("🔎", "Buscar no app", "Guias, contas, tarefas e registros", Routes.SEARCH),
         ),

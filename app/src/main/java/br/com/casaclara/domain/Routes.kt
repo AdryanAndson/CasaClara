@@ -27,6 +27,11 @@ object Routes {
     const val TIMER = "timer"
     const val WEEKPLAN = "weekplan"
     const val IMPORT = "import"
+    const val EMERGENCY = "emergency"
+    const val DOCS = "docs"
+    const val CONSUMO = "consumo"
+    const val GOLPE = "golpe"
+    const val QUIZ = "quiz"
 
     fun finance(tab: Int = 0) = "finance?tab=$tab"
     fun house(tab: Int = 0) = "house?tab=$tab"

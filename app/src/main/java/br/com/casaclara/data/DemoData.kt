@@ -23,6 +23,11 @@ object DemoData {
         t.upsert(TxEntity(kind = "SAIDA", description = "Ventilador (exemplo)", amount = 36000, date = day(8), category = "Casa", payment = "Crédito", cardId = cardId, installments = 3, isDemo = true))
         db.recurring().upsert(RecurringEntity(kind = "SAIDA", description = "Streaming (exemplo)", amount = 4000, category = "Assinaturas", day = 6,
             startMonth = br.com.casaclara.domain.Dates.monthKey(today.toEpochDay()), lastGenerated = br.com.casaclara.domain.Dates.monthKey(today.toEpochDay()), active = true, cardId = null, incomeType = null, isDemo = true))
+        db.docs().upsert(DocEntity(name = "CNH (exemplo)", kind = "DOCUMENTO", expires = rel(20), remindDays = 30, place = "Carteira e app gov.br", isDemo = true))
+        db.docs().upsert(DocEntity(name = "Contrato de aluguel (exemplo)", kind = "CONTRATO", expires = rel(300), remindDays = 60, place = "Pasta azul", isDemo = true))
+        db.readings().upsert(ReadingEntity(kind = "LUZ", date = rel(-60), value = 12450.0, isDemo = true))
+        db.readings().upsert(ReadingEntity(kind = "LUZ", date = rel(-30), value = 12588.0, isDemo = true))
+        db.readings().upsert(ReadingEntity(kind = "LUZ", date = rel(0), value = 12741.0, isDemo = true))
         db.bills().upsert(BillEntity(name = "Internet (exemplo)", amount = 10000, dueDay = 15, isDemo = true))
         db.bills().upsert(BillEntity(name = "Celular (exemplo)", amount = 5500, dueDay = 10, isDemo = true))
         db.debts().upsert(DebtEntity(name = "Notebook parcelado (exemplo)", creditor = "Loja", kind = "PARCELADO", installment = 18000, total = 10, paid = 4, dueDay = 20, isDemo = true))

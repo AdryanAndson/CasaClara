@@ -24,7 +24,7 @@ object Plans {
                 "Todas as calculadoras e a jornada personalizada",
                 "Finanças completas: lançamentos, contas, dívidas, orçamento, metas e relatórios",
                 "Mudança, casa, mercado, móveis e casa compartilhada",
-                "Biblioteca com 100 guias, favoritos e histórico",
+                "Biblioteca com ${br.com.casaclara.domain.content.Library.GUIDES.size} guias, favoritos e histórico",
                 "Lembretes locais e exportação CSV",
                 "Cópia de segurança local",
             ),

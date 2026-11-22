@@ -62,6 +62,12 @@ data class Snapshot(
     val guideFavorites: Int = 0,
     val remindersOn: Int = 0,
     val milestones: Int = 0,
+    val docs: Int = 0,
+    val readings: Int = 0,
+    val quizBest: Int = 0,
+    val emergencyCard: Boolean = false,
+    val scamChecks: Int = 0,
+    val laborCalc: Boolean = false,
 )
 
 data class JourneyStep(
@@ -169,6 +175,12 @@ object Achievements {
         Achievement("leitor", "Leitor(a) curioso(a)", "Leu 5 guias.", "📚") { it.guidesRead >= 5 },
         Achievement("biblioteca", "Rato de biblioteca", "Leu 20 guias.", "🦉") { it.guidesRead >= 20 },
         Achievement("lembrete", "Memória de elefante", "Ativou um lembrete.", "🔔") { it.remindersOn > 0 },
+        Achievement("papelada", "Papelada em dia", "Cadastrou um documento com validade.", "🪪") { it.docs > 0 },
+        Achievement("medidor", "Olho no medidor", "Anotou duas leituras de consumo.", "📟") { it.readings >= 2 },
+        Achievement("sabichao", "Sabe-tudo da casa", "Acertou 8 ou mais no teste rápido.", "🧠") { it.quizBest >= 8 },
+        Achievement("preparado", "Prevenido(a)", "Preencheu o cartão de emergência.", "🆘") { it.emergencyCard },
+        Achievement("anti-golpe", "Escudo anti-golpe", "Usou o detector de golpe.", "🛡️") { it.scamChecks > 0 },
+        Achievement("holerite", "Entendi meu salário", "Simulou o salário líquido.", "🧾") { it.laborCalc },
     )
 
     fun unlocked(s: Snapshot): Set<String> = ALL.filter { runCatching { it.check(s) }.getOrDefault(false) }.map { it.id }.toSet()

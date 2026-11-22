@@ -41,6 +41,11 @@ class AppContainer(val context: Context) {
             emergencyContacts = c.emergencyContacts, warranties = c.warranties, members = c.members,
             sharedExpenses = c.sharedExpenses, reimbursements = c.reimbursements, agreements = c.agreements,
             guidesRead = c.guidesRead, guideFavorites = c.guideFavorites, remindersOn = c.remindersOn, milestones = c.milestones,
+            docs = c.docs, readings = c.readings,
+            quizBest = p.calc["quiz"]?.get("best")?.toIntOrNull() ?: 0,
+            emergencyCard = !p.calc["emergencia"]?.get("tel1").isNullOrBlank(),
+            scamChecks = p.calc["golpe"]?.get("count")?.toIntOrNull() ?: 0,
+            laborCalc = (Money.parse(p.calc["salario"]?.get("bruto")) ?: 0) > 0,
         )
     }
 
@@ -51,6 +56,29 @@ class AppContainer(val context: Context) {
         val now = System.currentTimeMillis()
         novas.forEach { db.achievements().upsert(AchievementEntity(it, now)) }
         return novas.toList()
+    }
+
+    // ------------------- documentos com validade -------------------
+    suspend fun saveDoc(d: DocEntity) {
+        var rid = d.reminderId
+        val exp = d.expires
+        if (exp != null) {
+            val date = (exp - d.remindDays).coerceAtLeast(Dates.todayEpoch())
+            val r = ReminderEntity(id = rid ?: 0, title = "Vence em breve: ${d.name}", message = "Validade: ${Dates.br(exp)}. Hora de renovar.", kind = "OUTRO", date = date)
+            val newId = db.reminders().upsert(r)
+            if (rid == null) rid = newId
+            br.com.casaclara.notifications.ReminderScheduler.schedule(context, r.copy(id = rid))
+        } else if (rid != null) {
+            db.reminders().get(rid)?.let { db.reminders().delete(it) }
+            br.com.casaclara.notifications.ReminderScheduler.cancel(context, rid)
+            rid = null
+        }
+        db.docs().upsert(d.copy(reminderId = rid))
+    }
+
+    suspend fun deleteDoc(d: DocEntity) {
+        d.reminderId?.let { id -> db.reminders().get(id)?.let { db.reminders().delete(it) }; br.com.casaclara.notifications.ReminderScheduler.cancel(context, id) }
+        db.docs().delete(d)
     }
 
     // ------------------- ações com histórico -------------------
@@ -142,7 +170,7 @@ class AppContainer(val context: Context) {
     suspend fun removeDemo() {
         val s = db.stats()
         s.d1(); s.d2(); s.d3(); s.d4(); s.d5(); s.d6(); s.d7(); s.d8(); s.d9(); s.d10(); s.d11()
-        s.d12(); s.d13(); s.d14(); s.d15(); s.d16(); s.d17(); s.d18(); s.d19(); s.d20(); s.d21(); s.d22(); s.d23()
+        s.d12(); s.d13(); s.d14(); s.d15(); s.d16(); s.d17(); s.d18(); s.d19(); s.d20(); s.d21(); s.d22(); s.d23(); s.d24(); s.d25()
         prefs.update { it.copy(demoLoaded = false) }
     }
 

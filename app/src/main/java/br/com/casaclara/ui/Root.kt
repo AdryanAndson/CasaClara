@@ -199,6 +199,11 @@ private fun AppContent(c: AppContainer, p: UserPrefs) {
                     composable(Routes.TIMER) { TimerScreen(c, nav) }
                     composable(Routes.WEEKPLAN) { WeekPlanScreen(c, nav) }
                     composable(Routes.IMPORT) { ImportScreen(c, nav) }
+                    composable(Routes.EMERGENCY) { br.com.casaclara.ui.screens.EmergencyScreen(c, nav) }
+                    composable(Routes.DOCS) { br.com.casaclara.ui.screens.DocsScreen(c, nav) }
+                    composable(Routes.CONSUMO) { br.com.casaclara.ui.screens.ConsumptionScreen(c, nav) }
+                    composable(Routes.GOLPE) { br.com.casaclara.ui.screens.ScamScreen(c, nav) }
+                    composable(Routes.QUIZ) { br.com.casaclara.ui.screens.QuizScreen(c, nav) }
                 }
             }
             if (confettiKey != 0L) Confetti(confettiKey)
@@ -216,7 +221,7 @@ private fun androidx.navigation.NavGraphBuilder.tabRoute(route: String, content:
 private fun BottomBar(nav: NavHostController, route: String) {
     NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
         BOTTOM.forEach { item ->
-            val selected = route.startsWith(item.prefix) || (item.prefix == "more" && listOf("moving", "market", "furniture", "shared", "library", "guide", "achievements", "settings", "profile", "reminders", "calc", "search", "plans", "contacts", "customize", "timer", "weekplan", "import").any { route.startsWith(it) })
+            val selected = route.startsWith(item.prefix) || (item.prefix == "more" && listOf("moving", "market", "furniture", "shared", "library", "guide", "achievements", "settings", "profile", "reminders", "calc", "search", "plans", "contacts", "customize", "timer", "weekplan", "import", "emergency", "docs", "consumo", "golpe", "quiz").any { route.startsWith(it) })
             NavigationBarItem(
                 selected = selected,
                 onClick = {

@@ -216,7 +216,9 @@ import kotlinx.coroutines.flow.Flow
         (SELECT COUNT(*) FROM guide_state WHERE readCount > 0) AS guidesRead,
         (SELECT COUNT(*) FROM guide_state WHERE favorite = 1) AS guideFavorites,
         (SELECT COUNT(*) FROM reminders WHERE enabled = 1) AS remindersOn,
-        (SELECT COUNT(*) FROM milestones) AS milestones"""
+        (SELECT COUNT(*) FROM milestones) AS milestones,
+        (SELECT COUNT(*) FROM documents) AS docs,
+        (SELECT COUNT(*) FROM readings) AS readings"""
     )
     fun counts(month: Int): Flow<Counts>
 
@@ -243,4 +245,18 @@ import kotlinx.coroutines.flow.Flow
     @Query("DELETE FROM members WHERE isDemo = 1") suspend fun d21()
     @Query("DELETE FROM cards WHERE isDemo = 1") suspend fun d22()
     @Query("DELETE FROM recurring WHERE isDemo = 1") suspend fun d23()
+    @Query("DELETE FROM documents WHERE isDemo = 1") suspend fun d24()
+    @Query("DELETE FROM readings WHERE isDemo = 1") suspend fun d25()
+}
+
+@Dao interface DocDao {
+    @Query("SELECT * FROM documents ORDER BY CASE WHEN expires IS NULL THEN 1 ELSE 0 END, expires, name") fun all(): Flow<List<DocEntity>>
+    @Upsert suspend fun upsert(e: DocEntity): Long
+    @Delete suspend fun delete(e: DocEntity)
+}
+
+@Dao interface ReadingDao {
+    @Query("SELECT * FROM readings ORDER BY date DESC, id DESC") fun all(): Flow<List<ReadingEntity>>
+    @Upsert suspend fun upsert(e: ReadingEntity): Long
+    @Delete suspend fun delete(e: ReadingEntity)
 }

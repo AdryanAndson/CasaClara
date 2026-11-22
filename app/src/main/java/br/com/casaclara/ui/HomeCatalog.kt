@@ -36,6 +36,12 @@ data class ToolDef(val id: String, val emoji: String, val label: String, val rou
 object Tools {
     val ALL = listOf(
         ToolDef("lancar", "🧾", "Lançar gasto", Routes.finance(Routes.FinanceTab.LANCAMENTOS)),
+        ToolDef("emergencia", "🆘", "Emergência", Routes.EMERGENCY),
+        ToolDef("golpe", "🛡️", "É golpe?", Routes.GOLPE),
+        ToolDef("docs", "🪪", "Documentos", Routes.DOCS),
+        ToolDef("consumo", "💡", "Consumo", Routes.CONSUMO),
+        ToolDef("quiz", "🧠", "Teste rápido", Routes.QUIZ),
+        ToolDef("salario", "💵", "Salário líquido", Routes.calc("salario")),
         ToolDef("contas", "📅", "Contas", Routes.finance(Routes.FinanceTab.CONTAS)),
         ToolDef("cartoes", "💳", "Cartões", Routes.finance(Routes.FinanceTab.CARTOES)),
         ToolDef("recorrentes", "🔁", "Recorrentes", Routes.finance(Routes.FinanceTab.RECORRENTES)),

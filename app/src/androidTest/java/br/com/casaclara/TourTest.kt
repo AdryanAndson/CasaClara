@@ -79,9 +79,15 @@ class TourTest {
             tap("Faxina cronometrada"); shot("faxina"); back()
             tap("Importar extrato"); shot("importar"); back()
             tap("Personalizar o Início"); shot("personalizar"); back()
+            tap("Emergência"); shot("emergencia"); scrollDown(); shot("emergencia-2"); back()
+            tap("É golpe?"); tap("agir rápido", substring = true); tap("código recebido", substring = true); scrollDown(); shot("golpe"); back()
+            tap("Documentos e validades"); shot("documentos"); back()
+            tap("Consumo de luz, água e gás"); shot("consumo"); back()
+            tap("Teste rápido"); shot("quiz"); back()
+            tap("Calculadoras"); tap("Salário líquido", substring = true); shot("salario"); back(); back()
             tap("Dicas e guias"); shot("biblioteca")
-            tap("Segurança doméstica", substring = true); shot("categoria")
-            tap("Como agir em caso de vazamento de gás"); shot("guia")
+            tap("Golpes e segurança digital", substring = true); shot("categoria")
+            tap("Golpes com Pix: como reconhecer e se proteger"); shot("guia")
         }
     }
 }

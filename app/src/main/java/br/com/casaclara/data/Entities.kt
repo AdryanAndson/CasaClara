@@ -332,4 +332,28 @@ data class Counts(
     val marketItems: Int, val marketBought: Int, val favoritesMarket: Int, val meals: Int, val pantry: Int,
     val contacts: Int, val emergencyContacts: Int, val warranties: Int, val members: Int, val sharedExpenses: Int, val reimbursements: Int,
     val agreements: Int, val guidesRead: Int, val guideFavorites: Int, val remindersOn: Int, val milestones: Int,
+    val docs: Int, val readings: Int,
+)
+
+@Entity(tableName = "documents")
+data class DocEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val kind: String, // DOCUMENTO | CONTRATO | SEGURO | VEICULO | SAUDE | OUTRO
+    val expires: Long? = null,
+    val remindDays: Int = 30,
+    val place: String? = null,
+    val note: String? = null,
+    val reminderId: Long? = null,
+    val isDemo: Boolean = false,
+)
+
+@Entity(tableName = "readings")
+data class ReadingEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val kind: String, // LUZ | AGUA | GAS
+    val date: Long,
+    val value: Double,
+    val note: String? = null,
+    val isDemo: Boolean = false,
 )

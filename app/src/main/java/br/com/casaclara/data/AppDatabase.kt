@@ -15,8 +15,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         SharedExpenseEntity::class, ReimbursementEntity::class, SharedTaskEntity::class, AgreementEntity::class,
         MilestoneEntity::class, ReminderEntity::class, GuideStateEntity::class, AchievementEntity::class,
         CardEntity::class, RecurringEntity::class, GoalDepositEntity::class, TaskLogEntity::class,
+        DocEntity::class, ReadingEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -45,10 +46,19 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun recurring(): RecurringDao
     abstract fun goalDeposits(): GoalDepositDao
     abstract fun taskLog(): TaskLogDao
+    abstract fun docs(): DocDao
+    abstract fun readings(): ReadingDao
 
     companion object {
         const val NAME = "casaclara.db"
         /** v1 → v2: novas tabelas e colunas. Nada é apagado. */
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `documents` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `kind` TEXT NOT NULL, `expires` INTEGER, `remindDays` INTEGER NOT NULL, `place` TEXT, `note` TEXT, `reminderId` INTEGER, `isDemo` INTEGER NOT NULL)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `readings` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `kind` TEXT NOT NULL, `date` INTEGER NOT NULL, `value` REAL NOT NULL, `note` TEXT, `isDemo` INTEGER NOT NULL)")
+            }
+        }
+
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE `transactions` ADD COLUMN `cardId` INTEGER")
@@ -62,6 +72,6 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         fun build(context: Context): AppDatabase =
-            Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, NAME).addMigrations(MIGRATION_1_2).build()
+            Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, NAME).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build()
     }
 }

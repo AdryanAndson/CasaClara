@@ -1,0 +1,155 @@
+package br.com.casaclara.domain.content
+
+import br.com.casaclara.domain.content.Difficulty.*
+
+object ConsumidorGuides {
+    private val CDC = info("Baseado no Código de Defesa do Consumidor. Em caso de conflito, procure o Procon da sua cidade ou o consumidor.gov.br.")
+
+    val all = listOf(
+        Guide(
+            "direito-arrependimento", "consumidor", "Compras", "Comprei pela internet e me arrependi", "↩️", 4, FACIL,
+            problem = "Nas compras feitas fora da loja física, como internet, telefone ou catálogo, a lei dá um prazo para desistir sem precisar explicar o motivo.",
+            steps = listOf(
+                "O prazo de arrependimento é de 7 dias corridos, contados a partir do recebimento do produto ou da assinatura do serviço.",
+                "Avise a loja por escrito (e-mail, chat ou formulário) e guarde o protocolo.",
+                "A devolução do valor deve ser integral, incluindo o frete pago.",
+                "Devolva o produto com os acessórios, de preferência na embalagem.",
+                "Se a loja dificultar, registre reclamação no consumidor.gov.br.",
+            ),
+            mistakes = listOf("Desistir só por telefone, sem protocolo.", "Perder o prazo de 7 dias."),
+            checklist = listOf("Avisei por escrito", "Guardei o protocolo"),
+            related = listOf("consumidor-gov", "garantia-legal"),
+            alert = CDC, legal = true,
+        ),
+        Guide(
+            "garantia-legal", "consumidor", "Garantia", "Garantia legal e garantia do fabricante", "🛠️", 5, MEDIO,
+            problem = "Produto com defeito tem garantia por lei, mesmo sem papel nenhum do fabricante. Saber os prazos ajuda a exigir conserto, troca ou devolução.",
+            steps = listOf(
+                "Garantia legal: 30 dias para produtos e serviços não duráveis e 90 dias para duráveis, contados da entrega.",
+                "A garantia do fabricante é somada à legal, conforme o termo de garantia.",
+                "Em vício de qualidade, o fornecedor tem até 30 dias para consertar.",
+                "Se não resolver no prazo, você pode escolher troca, devolução do dinheiro ou abatimento no preço.",
+                "Guarde a nota fiscal e cadastre o produto na aba Documentos e garantias com a data de fim.",
+            ),
+            mistakes = listOf("Jogar a nota fiscal fora.", "Aceitar ficar meses esperando o conserto."),
+            checklist = listOf("Guardei a nota", "Cadastrei a garantia no app"),
+            related = listOf("garantias-notas", "acompanhar-garantias", "consumidor-gov"),
+            alert = CDC, legal = true,
+        ),
+        Guide(
+            "consumidor-gov", "consumidor", "Reclamações", "Como reclamar e resolver: SAC, consumidor.gov.br e Procon", "📣", 5, FACIL,
+            problem = "Muitos problemas se resolvem rápido quando a reclamação é bem feita, nos canais certos e com provas.",
+            steps = listOf(
+                "Comece pelo SAC da empresa e anote o número de protocolo, a data e o nome do atendente.",
+                "Explique em poucas linhas o que aconteceu e o que você quer: troca, conserto, cancelamento ou devolução.",
+                "Sem solução, registre no consumidor.gov.br: a empresa tem prazo para responder.",
+                "Procure o Procon da sua cidade quando a empresa não estiver no consumidor.gov.br ou não resolver.",
+                "Para valores maiores, o Juizado Especial Cível aceita causas pequenas sem advogado.",
+            ),
+            mistakes = listOf("Reclamar sem provas.", "Perder o número de protocolo."),
+            checklist = listOf("Anotei o protocolo", "Juntei prints e notas"),
+            related = listOf("garantia-legal", "cobranca-indevida"),
+            alert = CDC, legal = true,
+        ),
+        Guide(
+            "cobranca-indevida", "consumidor", "Cobranças", "Cobrança indevida: pagar em dobro?", "💸", 4, MEDIO,
+            problem = "Cobranças de serviço não contratado, valores errados e tarifas desconhecidas aparecem mais do que parece. Você pode contestar e pedir o dinheiro de volta.",
+            steps = listOf(
+                "Confira faturas de celular, internet e cartão todo mês, linha por linha.",
+                "Encontrou algo errado? Conteste com a empresa e peça o cancelamento e o estorno.",
+                "Pela lei, quem pagou cobrança indevida tem direito, em regra, a receber em dobro o que pagou a mais, com correção.",
+                "Use o consumidor.gov.br ou o Procon se a empresa não resolver.",
+            ),
+            checklist = listOf("Conferi as faturas do mês"),
+            related = listOf("consumidor-gov", "gastos-esquecidos"),
+            alert = CDC, legal = true,
+        ),
+        Guide(
+            "cancelar-servicos", "consumidor", "Contratos", "Cancelar internet, celular e assinaturas", "✂️", 4, FACIL,
+            problem = "Empresas às vezes dificultam o cancelamento. Mas você tem direito de cancelar pelo mesmo canal que contratou, inclusive pela internet.",
+            steps = listOf(
+                "Antes, confira se há multa de fidelidade e quanto falta para acabar.",
+                "Peça o cancelamento pelo app, site ou SAC e exija o número de protocolo.",
+                "Recuse ofertas se você já decidiu cancelar.",
+                "Confira na fatura seguinte se a cobrança parou.",
+                "Revise a lista de assinaturas do cartão a cada três meses.",
+            ),
+            mistakes = listOf("Só parar de pagar, sem cancelar: vira dívida."),
+            checklist = listOf("Revisei minhas assinaturas", "Cancelei o que não uso"),
+            related = listOf("gastos-esquecidos", "cobranca-indevida"),
+            alert = CDC, legal = true,
+        ),
+        Guide(
+            "compras-online-seguras", "consumidor", "Compras", "Comprar on-line sem cair em loja falsa", "🛒", 4, FACIL,
+            problem = "Lojas falsas copiam marcas conhecidas e oferecem preços impossíveis. Alguns sinais simples ajudam a evitar.",
+            steps = listOf(
+                "Desconfie de preço muito abaixo do normal e de pagamento só por Pix.",
+                "Procure CNPJ, endereço e telefone no site e pesquise reclamações.",
+                "Prefira pagar com cartão de crédito ou cartão virtual: fica mais fácil contestar.",
+                "Confira se o endereço do site é mesmo o da loja.",
+                "Guarde prints do anúncio, do pedido e da conversa.",
+            ),
+            checklist = listOf("Pesquisei a loja antes de comprar"),
+            related = listOf("direito-arrependimento", "links-falsos"),
+        ),
+        Guide(
+            "conta-luz-entender", "consumidor", "Contas da casa", "Entender a conta de luz e pagar menos", "💡", 5, MEDIO,
+            problem = "A conta de luz mistura consumo, bandeiras tarifárias, impostos e taxas. Entender a conta ajuda a perceber erros e a economizar.",
+            steps = listOf(
+                "Ache o consumo em kWh do mês e compare com os meses anteriores no histórico da própria conta.",
+                "Observe a bandeira tarifária: amarela e vermelha deixam o kWh mais caro.",
+                "Anote a leitura do medidor no app (aba Consumo) para acompanhar entre as contas.",
+                "Chuveiro elétrico, geladeira velha e ferro de passar costumam ser os maiores vilões.",
+                "Quem tem CadÚnico pode ter direito à tarifa social: pergunte à distribuidora.",
+                "Leitura muito acima do normal? Peça uma releitura ou vistoria à distribuidora.",
+            ),
+            checklist = listOf("Anotei a leitura do medidor", "Comparei com o mês anterior"),
+            related = listOf("economizar-basico", "cadunico", "conta-agua-entender"),
+            legal = true,
+        ),
+        Guide(
+            "conta-agua-entender", "consumidor", "Contas da casa", "Conta de água alta: como investigar", "🚰", 4, MEDIO,
+            problem = "Conta de água que sobe do nada pode ser vazamento escondido. Um teste simples no hidrômetro ajuda a descobrir.",
+            steps = listOf(
+                "Feche todas as torneiras e não use água por meia hora.",
+                "Anote os números do hidrômetro antes e depois: se mudaram, há vazamento.",
+                "Confira a descarga: um pouco de borra de café no vaso mostra se a água está escorrendo sem parar.",
+                "Anote a leitura todo mês na aba Consumo para perceber mudanças cedo.",
+                "Em apartamento com hidrômetro coletivo, converse com o síndico sobre a divisão.",
+            ),
+            checklist = listOf("Fiz o teste do hidrômetro", "Anotei a leitura"),
+            related = listOf("sinais-vazamento", "conta-luz-entender"),
+        ),
+        Guide(
+            "nome-negativado", "consumidor", "Dívidas", "Nome negativado: como consultar e negociar", "📉", 5, MEDIO,
+            problem = "Nome negativado dificulta alugar, financiar e até conseguir alguns empregos. Negociar com calma e pelos canais certos é o caminho mais seguro.",
+            steps = listOf(
+                "Consulte de graça seu CPF nos birôs de crédito e no Registrato do Banco Central.",
+                "Confira se a dívida é sua, o valor e a data; dívidas muito antigas podem ter prazos diferentes de cobrança.",
+                "Negocie pelos canais oficiais do credor ou em plataformas de renegociação reconhecidas.",
+                "Só aceite parcela que cabe no orçamento sem atrasar outras contas.",
+                "Depois de pagar, a empresa tem prazo para tirar seu nome do cadastro; guarde o comprovante.",
+            ),
+            mistakes = listOf("Fechar acordo por telefone com quem ligou dizendo ser da empresa.", "Aceitar parcela que vai atrasar de novo."),
+            checklist = listOf("Consultei meu CPF", "Listei as dívidas", "Calculei a parcela possível"),
+            related = listOf("juros-divida", "golpe-nome-sujo"),
+            alert = CDC, legal = true,
+        ),
+        Guide(
+            "direitos-inquilino", "consumidor", "Aluguel", "Direitos e deveres básicos de quem aluga", "🔑", 6, MEDIO,
+            problem = "A Lei do Inquilinato define o que é responsabilidade de quem aluga e de quem é dono. Conhecer o básico evita discussões e prejuízos.",
+            steps = listOf(
+                "O proprietário entrega o imóvel em condições de uso e responde por problemas estruturais.",
+                "Quem aluga paga aluguel e encargos combinados e cuida dos pequenos reparos do uso diário.",
+                "Só pode haver uma garantia por contrato: caução, fiador, seguro-fiança ou título de capitalização.",
+                "A caução em dinheiro tem limite de até três meses de aluguel.",
+                "Reformas e benfeitorias devem ser combinadas por escrito antes.",
+                "Na saída, faça vistoria e compare com as fotos da entrada.",
+            ),
+            mistakes = listOf("Aceitar duas garantias no mesmo contrato.", "Fazer reforma sem autorização escrita."),
+            checklist = listOf("Li o contrato inteiro", "Tenho fotos da vistoria de entrada"),
+            related = listOf("contrato-garantias", "registrar-chaves", "documentar-problemas"),
+            alert = info("Resumo geral da Lei do Inquilinato. Para casos específicos, procure a Defensoria Pública ou um advogado."), legal = true,
+        ),
+    )
+}

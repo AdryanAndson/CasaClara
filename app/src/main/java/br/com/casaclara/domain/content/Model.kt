@@ -58,11 +58,20 @@ object Library {
         Category("seguranca", "Segurança doméstica", "🛡️", 0xFFFFE2DE, "Gás, eletricidade, incêndio e golpes."),
         Category("compartilhada", "Vida compartilhada", "🧑‍🤝‍🧑", 0xFFD9F5E8, "Contas, tarefas e convivência."),
         Category("rotina", "Rotina e bem-estar", "🌱", 0xFFEFE6FF, "Uma rotina possível, com tempo para descansar."),
+        Category("trabalho", "Trabalho e renda", "💼", 0xFFFFF4C7, "Holerite, férias, 13º, FGTS, MEI e carreira."),
+        Category("documentos", "Documentos e burocracia", "🪪", 0xFFDFE9FF, "Gov.br, identidade, CPF, imposto de renda e benefícios."),
+        Category("digital", "Golpes e segurança digital", "🔒", 0xFFFFE2DE, "Pix, WhatsApp, links falsos e proteção do CPF."),
+        Category("saude", "Saúde e SUS", "🏥", 0xFFD9F5E8, "Onde ser atendido, remédios, vacinas e prevenção."),
+        Category("consumidor", "Direitos do consumidor", "📣", 0xFFFFF4C7, "Garantia, arrependimento, contas e reclamações."),
+        Category("transporte", "Transporte e cidade", "🚌", 0xFFDFE9FF, "Custos, segurança no trajeto e o bairro novo."),
+        Category("emocional", "Emoções e conexões", "🫂", 0xFFEFE6FF, "Solidão, amizades, família e lazer barato."),
+        Category("emergencias", "Emergências em casa", "🆘", 0xFFFFE2DE, "Vazamento, curto, chuva forte e primeiros cuidados."),
     )
 
     val GUIDES: List<Guide> by lazy {
         PreparoGuides.all + DinheiroGuides.all + AluguelGuides.all + MudancaGuides.all + LimpezaGuides.all +
-            CozinhaGuides.all + MoveisGuides.all + ManutencaoGuides.all + SegurancaGuides.all + CompartilhadaGuides.all + RotinaGuides.all
+            CozinhaGuides.all + MoveisGuides.all + ManutencaoGuides.all + SegurancaGuides.all + CompartilhadaGuides.all + RotinaGuides.all +
+            TrabalhoGuides.all + DocumentosGuides.all + DigitalGuides.all + SaudeGuides.all + ConsumidorGuides.all + TransporteGuides.all + BemEstarGuides.all + EmergenciaGuides.all
     }
     val BY_ID: Map<String, Guide> by lazy { GUIDES.associateBy { it.id } }
 

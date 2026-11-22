@@ -1,5 +1,7 @@
 package br.com.casaclara.ui.screens
 
+import androidx.compose.material3.Switch
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +35,7 @@ import androidx.navigation.NavController
 import br.com.casaclara.data.AppContainer
 import br.com.casaclara.data.GoalEntity
 import br.com.casaclara.domain.Calculators
+import br.com.casaclara.domain.Labor
 import br.com.casaclara.domain.Dates
 import br.com.casaclara.domain.Money
 import br.com.casaclara.domain.Routes
@@ -71,6 +74,9 @@ private val CALCS = listOf(
     CalcInfo("moveis", "🛋️", "Custo de móveis e eletrodomésticos", "Orçamento por item e prioridades.", Routes.furniture(0)),
     CalcInfo("transporte", "🚌", "Custo mensal de transporte", "Ônibus, carro ou aplicativo."),
     CalcInfo("parcelamento", "💳", "Quanto custa parcelar", "Juros e total pago."),
+    CalcInfo("salario", "🧾", "Salário líquido (CLT ${Labor.YEAR})", "INSS, Imposto de Renda e vale-transporte."),
+    CalcInfo("ferias", "🏖️", "Férias", "Valor das férias com 1/3 e venda de dias."),
+    CalcInfo("decimo", "🎁", "13º salário", "Primeira e segunda parcela, com descontos."),
 )
 
 @Composable
@@ -118,6 +124,9 @@ fun CalculatorScreen(c: AppContainer, nav: NavController, id: String) {
             "cenarios" -> CenariosCalc(c)
             "transporte" -> TransporteCalc(c)
             "parcelamento" -> InstallmentCalculator()
+            "salario" -> SalarioCalc(c)
+            "ferias" -> FeriasCalc(c)
+            "decimo" -> DecimoCalc(c)
             else -> EmptyState("Calculadora não encontrada", "Volte e escolha outra.", Mood.CONFUSA)
         }
         Text("Estimativa baseada nos números informados. Não é garantia de resultado.", style = MaterialTheme.typography.bodySmall)
@@ -346,4 +355,94 @@ private fun TransporteCalc(c: AppContainer) {
     SectionTitle("📱 Aplicativo")
     NumberInput("Corridas por mês", v["corridas"] ?: "", { set("corridas", it) })
     MoneyInput("Valor médio da corrida", v["corrida"] ?: "", { set("corrida", it) })
+}
+
+
+// ------------------------------------------------------------------ Trabalhistas (CLT)
+@Composable
+private fun LaborNote() {
+    AlertBox("Estimativa com as tabelas de ${Labor.YEAR} (INSS e Imposto de Renda com a isenção até R$ 5.000). O valor exato depende da empresa, de adicionais e de outros descontos. Confira sempre o seu holerite.", "INFO")
+}
+
+@Composable
+private fun LaborLine(label: String, value: Long, minus: Boolean = false, bold: Boolean = false) {
+    Row(Modifier.fillMaxWidth()) {
+        Text(label, Modifier.weight(1f), fontWeight = if (bold) FontWeight.Black else FontWeight.Normal)
+        Text((if (minus && value > 0) "− " else "") + Money.format(value), fontWeight = if (bold) FontWeight.Black else FontWeight.Bold,
+            color = if (minus && value > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+@Composable
+private fun SalarioCalc(c: AppContainer) {
+    val (v, set) = rememberCalc(c, "salario") ?: return
+    val bruto = m(v, "bruto") ?: 0
+    val deps = v["deps"]?.toIntOrNull() ?: 0
+    val vt = v["vt"] == "1"
+    val r = Labor.liquido(bruto, deps, vt, m(v, "custovt"), m(v, "outros") ?: 0, m(v, "pensao") ?: 0)
+    ResultCard {
+        Stat("Salário líquido estimado", Money.format(r.liquido))
+        LaborLine("Salário bruto", r.bruto)
+        LaborLine("INSS", r.inss, minus = true)
+        LaborLine("Imposto de Renda" + if (r.ir.reducao > 0) " (já com redução)" else "", r.irrf, minus = true)
+        if (vt) LaborLine("Vale-transporte", r.valeTransporte, minus = true)
+        if (r.outros > 0) LaborLine("Outros descontos", r.outros, minus = true)
+        LaborLine("Líquido", r.liquido, bold = true)
+        Text("FGTS depositado pela empresa (não sai do seu salário): ${Money.format(r.fgts)} por mês.", style = MaterialTheme.typography.bodySmall)
+        if (bruto in 1..500000) Text("Até R$ 5.000 de salário, o Imposto de Renda na fonte fica zerado em ${Labor.YEAR}.", style = MaterialTheme.typography.bodySmall)
+    }
+    LaborNote()
+    MoneyInput("Salário bruto mensal", v["bruto"] ?: "", { set("bruto", it) }, help = "O valor do contrato, antes dos descontos.")
+    NumberInput("Dependentes para o Imposto de Renda", v["deps"] ?: "0", { set("deps", it) })
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Switch(checked = vt, onCheckedChange = { set("vt", if (it) "1" else "0") })
+        Spacer(Modifier.width(8.dp)); Text("Uso vale-transporte")
+    }
+    if (vt) MoneyInput("Custo das passagens no mês (opcional)", v["custovt"] ?: "", { set("custovt", it) }, help = "O desconto é até 6% do salário ou o custo das passagens, o que for menor.")
+    MoneyInput("Pensão alimentícia descontada (se houver)", v["pensao"] ?: "", { set("pensao", it) })
+    MoneyInput("Outros descontos (plano, refeição…)", v["outros"] ?: "", { set("outros", it) })
+}
+
+@Composable
+private fun FeriasCalc(c: AppContainer) {
+    val (v, set) = rememberCalc(c, "ferias") ?: return
+    val sal = m(v, "sal") ?: 0
+    val vend = (v["vend"]?.toIntOrNull() ?: 0).coerceIn(0, 10)
+    val dias = (v["dias"]?.toIntOrNull() ?: 30)
+    val r = Labor.ferias(sal, m(v, "medias") ?: 0, dias, vend, v["deps"]?.toIntOrNull() ?: 0)
+    ResultCard {
+        Stat("Você recebe (estimado)", Money.format(r.liquido))
+        LaborLine("Férias (${r.dias} dias)", r.valorFerias)
+        LaborLine("1/3 constitucional", r.terco)
+        if (r.abono > 0) { LaborLine("Abono (${vend} dias vendidos)", r.abono); LaborLine("1/3 do abono", r.tercoAbono) }
+        LaborLine("INSS", r.inss, minus = true)
+        LaborLine("Imposto de Renda", r.irrf, minus = true)
+        LaborLine("Total líquido", r.liquido, bold = true)
+        Text("O pagamento vem até 2 dias antes das férias. O salário do mês seguinte costuma vir menor — reserve uma parte.", style = MaterialTheme.typography.bodySmall)
+    }
+    LaborNote()
+    MoneyInput("Salário bruto mensal", v["sal"] ?: "", { set("sal", it) })
+    MoneyInput("Média de horas extras e adicionais (se houver)", v["medias"] ?: "", { set("medias", it) })
+    NumberInput("Dias de férias", v["dias"] ?: "30", { set("dias", it) }, help = "Mínimo de 5 dias por período.")
+    NumberInput("Dias vendidos (abono)", v["vend"] ?: "0", { set("vend", it) }, help = "Até 10 dias.")
+    NumberInput("Dependentes para o Imposto de Renda", v["deps"] ?: "0", { set("deps", it) })
+}
+
+@Composable
+private fun DecimoCalc(c: AppContainer) {
+    val (v, set) = rememberCalc(c, "decimo") ?: return
+    val r = Labor.decimoTerceiro(m(v, "sal") ?: 0, m(v, "medias") ?: 0, v["meses"]?.toIntOrNull() ?: 12, v["deps"]?.toIntOrNull() ?: 0)
+    ResultCard {
+        Stat("13º líquido (estimado)", Money.format(r.liquidoTotal))
+        LaborLine("13º bruto (${r.meses}/12)", r.bruto)
+        LaborLine("1ª parcela (até 30/11, sem descontos)", r.primeira)
+        LaborLine("INSS (sai da 2ª parcela)", r.inss, minus = true)
+        LaborLine("Imposto de Renda (sai da 2ª parcela)", r.irrf, minus = true)
+        LaborLine("2ª parcela (até 20/12)", r.segunda, bold = true)
+    }
+    LaborNote()
+    MoneyInput("Salário bruto mensal", v["sal"] ?: "", { set("sal", it) })
+    MoneyInput("Média de horas extras e adicionais (se houver)", v["medias"] ?: "", { set("medias", it) })
+    NumberInput("Meses trabalhados no ano", v["meses"] ?: "12", { set("meses", it) }, help = "Conta o mês em que trabalhou 15 dias ou mais.")
+    NumberInput("Dependentes para o Imposto de Renda", v["deps"] ?: "0", { set("deps", it) })
 }

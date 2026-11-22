@@ -165,7 +165,7 @@ fun OnboardingScreen(c: AppContainer, onDone: (String) -> Unit) {
                         "🧮" to "Descubra quanto custa morar sozinho e se o aluguel cabe no bolso.",
                         "💰" to "Organize dinheiro, contas, dívidas e metas sem planilha assustadora.",
                         "🧹" to "Cuide da casa com rotinas, listas e lembretes.",
-                        "📚" to "Consulte 100 guias práticos para a vida adulta.",
+                        "📚" to "Consulte ${br.com.casaclara.domain.content.Library.GUIDES.size} guias práticos para a vida adulta.",
                     ).forEach { (e, t) -> Row(verticalAlignment = Alignment.CenterVertically) { Text(e, style = MaterialTheme.typography.headlineSmall); Spacer(Modifier.width(12.dp)); Text(t) } }
                     AlertBox("Sem cadastro e sem internet: seus dados ficam guardados só neste aparelho.", "OK")
                     PrimaryButton("Começar", Modifier.fillMaxWidth()) { next() }
