@@ -1,5 +1,7 @@
 package br.com.casaclara.ui
 
+import androidx.compose.ui.graphics.graphicsLayer
+
 import br.com.casaclara.data.settings
 
 import br.com.casaclara.ui.components.cartoonShadow
@@ -136,10 +138,12 @@ fun CasaClaraRoot(c: AppContainer, pendingRoute: androidx.compose.runtime.Mutabl
     }
     val st = p.settings
     // estados globais lidos durante a composição (valores ocultos, animações)
-    UiFlags.hideValues.value = st.hideValues
-    UiFlags.reduceMotion.value = !st.animations
-    UiFlags.confetti.value = st.confetti && st.animations
-    UiFlags.haptics.value = st.haptics
+    androidx.compose.runtime.SideEffect {
+        UiFlags.hideValues.value = st.hideValues
+        UiFlags.reduceMotion.value = !st.animations
+        UiFlags.confetti.value = st.confetti && st.animations
+        UiFlags.haptics.value = st.haptics
+    }
     CasaClaraTheme(p.theme, p.textScale, st.accent, st.classicFont) {
         LockGate(st.lock && p.onboarded) { AppContent(c, p, pendingRoute) }
     }
@@ -293,7 +297,7 @@ private fun Confetti(key: Long) {
     LaunchedEffect(key) { progress.snapTo(0f); progress.animateTo(1f, tween(1700)) }
     if (progress.value >= 1f) return
     val colors = listOf(Brand.Amarelo, Brand.Verde, Brand.Azul, Brand.Coral, Color(0xFF9B7BE0))
-    Canvas(Modifier.fillMaxSize()) {
+    Canvas(Modifier.fillMaxSize().graphicsLayer()) {
         val n = 40
         for (i in 0 until n) {
             val x = size.width * ((i * 37 % 100) / 100f)

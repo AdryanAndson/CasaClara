@@ -93,7 +93,8 @@ import br.com.casaclara.ui.theme.Brand
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-/** Dados que os cartões do Início usam (lidos uma vez e compartilhados). */
+/** Dados que os cartões do Início usam (lidos uma vez e compartilhados). Imutável: cartões que não mudaram não são redesenhados. */
+@androidx.compose.runtime.Immutable
 private class HomeData(
     val p: UserPrefs, val j: JourneyState, val tx: List<TxEntity>, val bills: List<BillEntity>, val tasks: List<HouseTaskEntity>,
     val goals: List<GoalEntity>, val shop: List<ShopEntity>, val unlocked: List<String>, val doneThisWeek: Int,
@@ -112,7 +113,7 @@ fun HomeScreen(c: AppContainer, nav: NavController) {
     val weekStart = Weekly.weekStart(Dates.today()).toEpochDay()
     val log by remember(weekStart) { c.db.taskLog().since(weekStart) }.asState(emptyList(), weekStart)
     val planning = p.situation == Situation.PAIS || p.situation == Situation.JUNTANDO
-    val d = HomeData(p, journeyOf(snap, p), tx, bills, tasks, goals, shop, unlocked.map { it.id }, log.size)
+    val d = remember(p, snap, tx, bills, tasks, goals, shop, unlocked, log) { HomeData(p, journeyOf(snap, p), tx, bills, tasks, goals, shop, unlocked.map { it.id }, log.size) }
     val simple = p.settings.simpleMode
     val order = HomeCatalog.resolve(p.homeOrder, planning).filter { it !in p.homeHidden }
         .let { o -> if (simple) o.filter { it in setOf("proximo", "contas", "tarefas", "mercado", "atalhos") } else o }
@@ -120,7 +121,7 @@ fun HomeScreen(c: AppContainer, nav: NavController) {
     // entrada em cascata dos cartões (desligada se o sistema pede menos movimento)
     val reduce = rememberReduceMotion()
     var shown by remember { mutableIntStateOf(if (reduce) 99 else 0) }
-    LaunchedEffect(Unit) { if (!reduce) while (shown < 20) { delay(70); shown++ } }
+    LaunchedEffect(Unit) { if (!reduce) while (shown < order.size + 1) { delay(60); shown++ } }
 
     Page {
         HeroWithC(c, d, nav)

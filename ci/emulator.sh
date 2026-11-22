@@ -34,6 +34,13 @@ ls -la shots
 adb logcat -d | grep -E "FATAL EXCEPTION" -A 30 > crash.txt || true
 if ! grep -q "^OK (" instrument.txt; then echo "O passeio de interface falhou"; exit 1; fi
 
+# Fluidez: rola o Início (com dados de exemplo) e mede quadros lentos
+adb shell am force-stop $PKG; adb shell am start -W -n $PKG/.MainActivity > /dev/null; sleep 5
+adb shell dumpsys gfxinfo $PKG reset > /dev/null
+for i in 1 2 3 4 5 6; do adb shell input swipe 540 1700 540 500 300; sleep 0.6; done
+for i in 1 2 3 4 5 6; do adb shell input swipe 540 500 540 1700 300; sleep 0.6; done
+adb shell dumpsys gfxinfo $PKG | grep -E "Total frames rendered|Janky frames|50th percentile|90th percentile" | tee shots/fluidez.txt
+
 # Tempo de abertura (debug) para comparação
 adb shell am force-stop $PKG
 echo "debug: $(adb shell am start -W -n $PKG/.MainActivity | grep TotalTime)" | tee shots/timing.txt

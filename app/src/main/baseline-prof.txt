@@ -1,0 +1,4 @@
+# Perfil de inicialização: pede ao Android para compilar o código do app com antecedência
+# (instalado pelo profileinstaller). Deixa a abertura e as primeiras rolagens mais suaves.
+HSPLbr/com/casaclara/**->**(**)**
+Lbr/com/casaclara/**;

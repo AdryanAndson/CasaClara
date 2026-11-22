@@ -1,5 +1,7 @@
 package br.com.casaclara.ui.components
 
+import androidx.compose.ui.graphics.graphicsLayer
+
 import android.provider.Settings
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -51,6 +53,7 @@ fun rememberReduceMotion(): Boolean {
 @Composable
 fun Mascot(mood: Mood = Mood.FELIZ, size: Dp = 96.dp, modifier: Modifier = Modifier, describe: Boolean = true) {
     val reduce = rememberReduceMotion()
+    if (reduce) { StaticMascot(mood, size, modifier, describe); return }
     val tr = rememberInfiniteTransition(label = "mascote")
     val bob by tr.animateFloat(
         initialValue = 0f, targetValue = if (reduce) 0f else 1f,
@@ -62,13 +65,29 @@ fun Mascot(mood: Mood = Mood.FELIZ, size: Dp = 96.dp, modifier: Modifier = Modif
     )
     val ink = if (LocalDark.current) Color(0xFF0E151B) else Brand.Tinta
     val m = if (describe) modifier.semantics { contentDescription = "Clarinha, a casinha mascote, ${mood.label}" } else modifier
-    Canvas(m.size(size)) {
+    // camada própria: a animação redesenha só a mascote, não a tela inteira a cada quadro
+    Canvas(m.size(size).graphicsLayer()) {
         val s = this.size.minDimension / 124f
         scale(s, s, pivot = Offset.Zero) {
             val lift = if (mood == Mood.COMEMORANDO) -10f * bob else -4f * bob
             // sombra
             drawOval(ink.copy(alpha = 0.15f), topLeft = Offset(30f, 114f), size = Size(60f, 8f))
             translate(top = lift) { drawHouse(mood, ink, wave) }
+            drawExtras(mood, ink)
+        }
+    }
+}
+
+/** Mascote parada (animações desligadas): sem nenhum quadro extra. */
+@Composable
+private fun StaticMascot(mood: Mood, size: Dp, modifier: Modifier, describe: Boolean) {
+    val ink = if (LocalDark.current) Color(0xFF0E151B) else Brand.Tinta
+    val m = if (describe) modifier.semantics { contentDescription = "Clarinha, a casinha mascote, ${mood.label}" } else modifier
+    Canvas(m.size(size)) {
+        val s = this.size.minDimension / 124f
+        scale(s, s, pivot = Offset.Zero) {
+            drawOval(ink.copy(alpha = 0.15f), topLeft = Offset(30f, 114f), size = Size(60f, 8f))
+            drawHouse(mood, ink, 0f)
             drawExtras(mood, ink)
         }
     }
