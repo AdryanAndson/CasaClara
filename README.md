@@ -117,3 +117,15 @@ app/src/main/java/br/com/casaclara/
 - **Testes**: testes de domínio (JVM) + passeio automatizado em emulador Android 8 e Android 14 no GitHub Actions, incluindo atualização da v1 para a v2.
 
 Baixe o APK: https://github.com/AdryanAndson/CasaClara/releases/download/apk/CasaClara.apk
+
+
+## Novidades da versão 3
+
+- **Biblioteca com 179 guias** em 19 categorias. As 8 novas: Trabalho e renda, Documentos e burocracia, Golpes e segurança digital, Saúde e SUS, Direitos do consumidor, Transporte e cidade, Emoções e conexões, Emergências em casa. Também +20 receitas (30 no total) e +50 dicas do dia.
+- **Calculadoras CLT 2026**: salário líquido (INSS 2026 + IRRF com a redução da Lei 15.270/2025), férias (com 1/3 e abono) e 13º (duas parcelas). Testadas com exemplos oficiais.
+- **Emergência**: números nacionais com discagem em um toque e cartão de emergência compartilhável.
+- **Documentos e validades**: lembrete automático antes de vencer (CNH, contrato, seguro…), mais as garantias de produtos.
+- **Consumo de luz, água e gás**: leituras do medidor, estimativa de 30 dias, tendência e custo estimado.
+- **É golpe?**: detector com 10 perguntas, nível de risco e o que fazer.
+- **Teste rápido**: 32 perguntas (10 por rodada), cada uma ligada a um guia.
+- 6 novas conquistas e banco de dados v3 com migração automática (v1 → v2 → v3 testada no emulador).
