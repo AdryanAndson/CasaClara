@@ -175,7 +175,7 @@ object Achievements {
         Achievement("leitor", "Leitor(a) curioso(a)", "Leu 5 guias.", "📚") { it.guidesRead >= 5 },
         Achievement("biblioteca", "Rato de biblioteca", "Leu 20 guias.", "🦉") { it.guidesRead >= 20 },
         Achievement("lembrete", "Memória de elefante", "Ativou um lembrete.", "🔔") { it.remindersOn > 0 },
-        Achievement("papelada", "Papelada em dia", "Cadastrou um documento com validade.", "🪪") { it.docs > 0 },
+        Achievement("validades", "Nada vence escondido", "Cadastrou um documento com validade.", "🪪") { it.docs > 0 },
         Achievement("medidor", "Olho no medidor", "Anotou duas leituras de consumo.", "📟") { it.readings >= 2 },
         Achievement("sabichao", "Sabe-tudo da casa", "Acertou 8 ou mais no teste rápido.", "🧠") { it.quizBest >= 8 },
         Achievement("preparado", "Prevenido(a)", "Preencheu o cartão de emergência.", "🆘") { it.emergencyCard },
