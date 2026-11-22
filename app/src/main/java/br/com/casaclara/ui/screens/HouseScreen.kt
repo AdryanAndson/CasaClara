@@ -278,7 +278,7 @@ private fun CalendarioTab(c: AppContainer) {
 /** Lista de compras reutilizada no mercado e nas compras da casa. */
 @Composable
 fun ShoppingList(c: AppContainer, list: String, categories: List<String>, title: String, description: String, favoritesOnly: Boolean = false) {
-    val items by c.db.shop().byList(list).asState(emptyList())
+    val items by c.db.shop().byList(list).asState(emptyList(), list)
     val scope = rememberCoroutineScope()
     val fb = LocalFeedback.current
     val confirm = LocalConfirm.current

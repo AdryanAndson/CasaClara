@@ -78,7 +78,7 @@ fun WeekPlanScreen(c: AppContainer, nav: NavController) {
     val milestones by c.db.milestones().all().asState(emptyList())
     val today = Dates.today()
     val ws = Weekly.weekStart(today)
-    val log by remember(ws) { c.db.taskLog().since(ws.toEpochDay()) }.asState(emptyList())
+    val log by remember(ws) { c.db.taskLog().since(ws.toEpochDay()) }.asState(emptyList(), ws)
     val scope = rememberCoroutineScope()
     val fb = LocalFeedback.current
     val ctx = LocalContext.current

@@ -104,7 +104,7 @@ fun HomeScreen(c: AppContainer, nav: NavController) {
     val shop by c.db.shop().byList("MERCADO").asState(emptyList())
     val unlocked by c.db.achievements().all().asState(emptyList())
     val weekStart = Weekly.weekStart(Dates.today()).toEpochDay()
-    val log by remember(weekStart) { c.db.taskLog().since(weekStart) }.asState(emptyList())
+    val log by remember(weekStart) { c.db.taskLog().since(weekStart) }.asState(emptyList(), weekStart)
     val planning = p.situation == Situation.PAIS || p.situation == Situation.JUNTANDO
     val d = HomeData(p, journeyOf(snap, p), tx, bills, tasks, goals, shop, unlocked.map { it.id }, log.size)
     val order = HomeCatalog.resolve(p.homeOrder, planning).filter { it !in p.homeHidden }

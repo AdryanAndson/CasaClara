@@ -14,7 +14,16 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 @Composable
-fun <T> Flow<T>.asState(initial: T): State<T> = collectAsStateWithLifecycle(initialValue = initial)
+/**
+ * Coleta um Flow como estado. O Flow é lembrado entre recomposições (as consultas do Room criam um Flow novo
+ * a cada chamada; sem isso a coleta reiniciava a cada recomposição, piscando listas vazias e gastando bateria).
+ * Passe [keys] quando a consulta depende de parâmetros que mudam.
+ */
+@androidx.compose.runtime.Composable
+fun <T> Flow<T>.asState(initial: T, vararg keys: Any?): State<T> {
+    val stable = androidx.compose.runtime.remember(*keys) { this }
+    return stable.collectAsStateWithLifecycle(initialValue = initial)
+}
 
 val FREQ_LABEL = linkedMapOf("DIARIA" to "Diária", "SEMANAL" to "Semanal", "QUINZENAL" to "Quinzenal", "MENSAL" to "Mensal", "SEMESTRAL" to "Semestral")
 val FREQ_DAYS = mapOf("DIARIA" to 1L, "SEMANAL" to 7L, "QUINZENAL" to 15L, "MENSAL" to 30L, "SEMESTRAL" to 182L)
