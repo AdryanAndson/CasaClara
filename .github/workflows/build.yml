@@ -2,6 +2,8 @@ name: Gerar APK
 on:
   push:
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,3 +22,11 @@ jobs:
         with:
           name: casa-clara-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Publicar APK para download
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk CasaClara.apk
+          gh release delete apk --yes --cleanup-tag || true
+          gh release create apk CasaClara.apk --title "Casa Clara — APK de teste" --notes "APK de teste (debug) gerado automaticamente a partir do último commit. Baixe no celular e instale (permita instalar apps desconhecidos)." --target "$GITHUB_SHA"
