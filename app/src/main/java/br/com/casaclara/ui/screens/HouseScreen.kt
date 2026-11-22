@@ -79,7 +79,7 @@ fun HouseScreen(c: AppContainer, nav: NavController, initialTab: Int) {
         Box(Modifier.padding(horizontal = 16.dp)) { ScreenHeader("Casa", "Pouco todo dia vence a faxina de seis horas.", ill = Ill.VASSOURA, tone = Tone.AZUL) }
         Tabs(listOf("Tarefas", "Limpeza por cômodo", "Calendário", "Compras da casa", "Inventário", "Garantias e notas"), tab) { tab = it }
         when (tab) {
-            0 -> TarefasTab(c)
+            0 -> TarefasTab(c, nav)
             1 -> LimpezaTab(c)
             2 -> CalendarioTab(c)
             3 -> TabBody { ShoppingList(c, "CASA", listOf("Limpeza", "Higiene", "Utensílios", "Manutenção", "Decoração", "Outros"), "Compras para a casa", "Produtos de limpeza, utensílios, lâmpadas e afins.") }
@@ -90,12 +90,16 @@ fun HouseScreen(c: AppContainer, nav: NavController, initialTab: Int) {
 }
 
 @Composable
-private fun TarefasTab(c: AppContainer) {
+private fun TarefasTab(c: AppContainer, nav: NavController) {
     val tasks by c.db.houseTasks().all().asState(emptyList())
     val scope = rememberCoroutineScope()
     val fb = LocalFeedback.current
     val pend = tasks.count { taskStatus(it).days <= 0 }
     TabBody {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            br.com.casaclara.ui.components.SecondaryButton("🗓️ Plano da semana", Modifier.weight(1f)) { nav.navigate(br.com.casaclara.domain.Routes.WEEKPLAN) }
+            br.com.casaclara.ui.components.SecondaryButton("⏱️ Faxina", Modifier.weight(1f)) { nav.navigate(br.com.casaclara.domain.Routes.TIMER) }
+        }
         if (tasks.isNotEmpty()) BrandCard(tone = Tone.VERDE) {
             Text(if (pend > 0) "$pend para hoje ou atrasada(s)" else "Tudo em dia! ✨", fontWeight = FontWeight.Bold)
             ProgressLine((tasks.size - pend).toFloat() / tasks.size, "Tarefas em dia")

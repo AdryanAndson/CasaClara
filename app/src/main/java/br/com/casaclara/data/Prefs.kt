@@ -39,6 +39,11 @@ data class UserPrefs(
     val lastRoute: String = "",
     val demoLoaded: Boolean = false,
     val calc: Map<String, Map<String, String>> = emptyMap(),
+    /** Início personalizável: ordem e cartões escondidos; atalhos favoritos. Vazio = padrão. */
+    val homeOrder: List<String> = emptyList(),
+    val homeHidden: Set<String> = emptySet(),
+    val shortcuts: List<String> = emptyList(),
+    val cleanMinutes: Int = 15,
 )
 
 class Prefs(private val context: Context) {
@@ -60,6 +65,10 @@ class Prefs(private val context: Context) {
         val skipped = stringPreferencesKey("skipped_steps")
         val lastRoute = stringPreferencesKey("last_route")
         val demo = booleanPreferencesKey("demo_loaded")
+        val homeOrder = stringPreferencesKey("home_order")
+        val homeHidden = stringPreferencesKey("home_hidden")
+        val shortcuts = stringPreferencesKey("shortcuts")
+        val cleanMinutes = longPreferencesKey("clean_minutes")
         val calcPrefix = "calc_"
     }
 
@@ -84,6 +93,10 @@ class Prefs(private val context: Context) {
             demoLoaded = p[K.demo] ?: false,
             calc = p.asMap().filterKeys { it.name.startsWith(K.calcPrefix) }
                 .mapNotNull { (k, v) -> (v as? String)?.let { k.name.removePrefix(K.calcPrefix) to decodeMap(it) } }.toMap(),
+            homeOrder = p[K.homeOrder].toList(),
+            homeHidden = p[K.homeHidden].toSet(),
+            shortcuts = p[K.shortcuts].toList(),
+            cleanMinutes = (p[K.cleanMinutes] ?: 15L).toInt(),
         )
     }
 
@@ -99,6 +112,7 @@ class Prefs(private val context: Context) {
                 theme = p[K.theme]?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() } ?: ThemeMode.SISTEMA,
                 textScale = p[K.textScale] ?: 1f, notifications = p[K.notifications] ?: true, journeyPaused = p[K.paused] ?: false,
                 manualSteps = p[K.manual].toSet(), skippedSteps = p[K.skipped].toSet(), lastRoute = p[K.lastRoute] ?: "", demoLoaded = p[K.demo] ?: false,
+                homeOrder = p[K.homeOrder].toList(), homeHidden = p[K.homeHidden].toSet(), shortcuts = p[K.shortcuts].toList(), cleanMinutes = (p[K.cleanMinutes] ?: 15L).toInt(),
             )
             val n = block(cur)
             p[K.onboarded] = n.onboarded
@@ -118,6 +132,10 @@ class Prefs(private val context: Context) {
             p[K.skipped] = n.skippedSteps.joinToString(",")
             p[K.lastRoute] = n.lastRoute
             p[K.demo] = n.demoLoaded
+            p[K.homeOrder] = n.homeOrder.joinToString(",")
+            p[K.homeHidden] = n.homeHidden.joinToString(",")
+            p[K.shortcuts] = n.shortcuts.joinToString(",")
+            p[K.cleanMinutes] = n.cleanMinutes.toLong()
         }
     }
 
@@ -132,6 +150,7 @@ class Prefs(private val context: Context) {
     }
 
     private fun String?.toSet(): Set<String> = this?.split(',')?.filter { it.isNotBlank() }?.toSet() ?: emptySet()
+    private fun String?.toList(): List<String> = this?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
 
     companion object {
         fun encodeMap(m: Map<String, String>): String =

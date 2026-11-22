@@ -33,6 +33,8 @@ import br.com.casaclara.ui.components.Tag
 import br.com.casaclara.ui.components.Tone
 import br.com.casaclara.ui.journeyOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun JourneyScreen(c: AppContainer, nav: NavController) {
@@ -66,9 +68,11 @@ fun JourneyScreen(c: AppContainer, nav: NavController) {
                 fb.toast(if (p.journeyPaused) "Jornada retomada. Bora!" else "Jornada pausada. Ela espera você.", Mood.TRANQUILA)
             }
             SecondaryButton("✏️ Editar", Modifier.weight(1f)) { nav.navigate(Routes.PROFILE) }
-            SecondaryButton("↺ Reiniciar", Modifier.weight(1f)) {
+        }
+        Row(Modifier.fillMaxWidth()) {
+            SecondaryButton("↺ Reiniciar jornada", Modifier.fillMaxWidth()) {
                 confirm.ask("Reiniciar a jornada?", "Você responde as perguntas iniciais de novo e os passos marcados à mão são zerados. Seus registros (dinheiro, listas, contas) NÃO são apagados.", "Reiniciar", danger = false) {
-                    scope.launch { c.restartJourney(); nav.navigate(Routes.ONBOARDING) { popUpTo(0) { inclusive = true } } }
+                    scope.launch { c.restartJourney(); withContext(Dispatchers.Main) { nav.navigate(Routes.ONBOARDING) { popUpTo(0) { inclusive = true } } } }
                 }
             }
         }

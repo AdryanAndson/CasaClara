@@ -60,6 +60,8 @@ import br.com.casaclara.ui.components.SecondaryButton
 import br.com.casaclara.ui.theme.LocalSoft
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private enum class OStep { INTRO, NOME, SITUACAO, OBJETIVO, RENDA, GUARDADO, META, ASSUNTOS, PRONTO }
 
@@ -121,8 +123,10 @@ fun OnboardingScreen(c: AppContainer, onDone: (String) -> Unit) {
             c.db.goals().upsert(GoalEntity(name = "Meta de mudança", type = "MUDANCA", target = mg, saved = sav ?: 0))
         }
         if (demo) c.loadDemo()
-        feedback.celebrate("Bem-vindo(a) ao Casa Clara!")
-        onDone(Routes.HOME)
+        withContext(Dispatchers.Main) {
+            feedback.celebrate("Bem-vindo(a) ao Casa Clara!")
+            onDone(Routes.HOME)
+        }
     }
 
     val mood = when (step) { OStep.INTRO -> Mood.ACENANDO; OStep.PRONTO -> Mood.COMEMORANDO; OStep.SITUACAO, OStep.OBJETIVO -> Mood.PENSANDO; OStep.RENDA, OStep.GUARDADO, OStep.META -> Mood.DICA; else -> Mood.FELIZ }

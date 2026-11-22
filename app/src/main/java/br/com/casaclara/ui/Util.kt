@@ -57,3 +57,26 @@ val MARKET_CATEGORIES = listOf("Hortifrúti", "Grãos e massas", "Carnes e ovos"
 val ROOMS = listOf("Cozinha", "Banheiro", "Quarto", "Sala", "Área de serviço", "Varanda", "Casa toda")
 val WEEKDAYS = listOf("Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo")
 val MEAL_TYPES = listOf("Café da manhã", "Almoço", "Lanche", "Jantar")
+
+/** Abre o menu de compartilhar do Android (WhatsApp, Telegram, e-mail…). */
+fun shareText(ctx: android.content.Context, title: String, text: String) {
+    val send = android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain").putExtra(android.content.Intent.EXTRA_TEXT, text)
+    ctx.startActivity(android.content.Intent.createChooser(send, title).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+}
+
+/** Lista de compras em texto, agrupada por categoria, pronta para mandar por mensagem. */
+fun marketListText(items: List<br.com.casaclara.data.ShopEntity>, title: String = "Lista de mercado"): String = buildString {
+    val pend = items.filter { !it.bought }
+    appendLine("🛒 $title")
+    if (pend.isEmpty()) { appendLine("Nada pendente! 🎉"); return@buildString }
+    pend.groupBy { it.category }.toSortedMap().forEach { (cat, l) ->
+        appendLine(); appendLine("*$cat*")
+        l.forEach { s ->
+            val q = if (s.qty == 1.0 && s.unit == "un") "" else " (${br.com.casaclara.ui.components.Init.num(s.qty)} ${s.unit})"
+            appendLine("☐ ${s.name}$q")
+        }
+    }
+    val est = pend.sumOf { ((it.price ?: 0L) * it.qty).toLong() }
+    if (est > 0) { appendLine(); appendLine("Estimativa: ${br.com.casaclara.domain.Money.format(est)}") }
+    appendLine(); append("Enviado pelo app Casa Clara")
+}

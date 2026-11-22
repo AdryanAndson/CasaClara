@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Casa Clara</string>
+    <string name="widget_desc">Tarefas de hoje, próximas contas e saldo do mês</string>
 </resources>

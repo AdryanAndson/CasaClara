@@ -111,6 +111,7 @@ fun <T> CrudList(
     val feedback = LocalFeedback.current
     val confirm = LocalConfirm.current
     var editing by remember { mutableStateOf<Any?>(null) } // NEW ou item
+    var limit by remember { mutableStateOf(60) } // listas grandes: mostra aos poucos (mais rápido)
     val novo = if (masculine) "Novo" else "Nova"
 
     if (title != null) SectionTitle(title)
@@ -125,8 +126,9 @@ fun <T> CrudList(
     if (items.isEmpty()) {
         EmptyState(empty.title, empty.text, empty.mood, actionText = "Adicionar $itemName", onAction = { editing = NEW })
     } else {
-        val groups: List<Pair<String, List<T>>> = if (groupBy == null) listOf("" to items) else
-            items.groupBy(groupBy).toList().sortedWith(compareBy({ g -> groupOrder.indexOf(g.first).let { if (it < 0) 999 else it } }, { it.first }))
+        val shownItems = items.take(limit)
+        val groups: List<Pair<String, List<T>>> = if (groupBy == null) listOf("" to shownItems) else
+            shownItems.groupBy(groupBy).toList().sortedWith(compareBy({ g -> groupOrder.indexOf(g.first).let { if (it < 0) 999 else it } }, { it.first }))
         groups.forEach { (g, list) ->
             if (g.isNotEmpty()) Text("$g (${list.size})", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 6.dp).semantics { heading() })
             list.forEach { it ->
@@ -147,6 +149,7 @@ fun <T> CrudList(
             }
         }
     }
+    if (items.size > limit) OutlinedButton(onClick = { limit += 60 }, modifier = Modifier.fillMaxWidth()) { Text("Mostrar mais (${items.size - limit} restantes)") }
     val e = editing
     if (e != null) {
         @Suppress("UNCHECKED_CAST") val item = if (e === NEW) null else e as T

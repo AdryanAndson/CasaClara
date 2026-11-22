@@ -75,6 +75,10 @@ import br.com.casaclara.ui.screens.AchievementsScreen
 import br.com.casaclara.ui.screens.CalculatorScreen
 import br.com.casaclara.ui.screens.CalculatorsScreen
 import br.com.casaclara.ui.screens.ContactsScreen
+import br.com.casaclara.ui.screens.CustomizeScreen
+import br.com.casaclara.ui.screens.TimerScreen
+import br.com.casaclara.ui.screens.WeekPlanScreen
+import br.com.casaclara.ui.screens.ImportScreen
 import br.com.casaclara.ui.screens.FinanceScreen
 import br.com.casaclara.ui.screens.FurnitureScreen
 import br.com.casaclara.ui.screens.GuideScreen
@@ -150,6 +154,7 @@ private fun AppContent(c: AppContainer, p: UserPrefs) {
         }
     }
     LaunchedEffect(toast) { if (toast != null) { delay(3200); toast = null } }
+    LaunchedEffect(Unit) { runCatching { c.runRecurring() } }
 
     val back by nav.currentBackStackEntryAsState()
     val route = back?.destination?.route ?: ""
@@ -190,6 +195,10 @@ private fun AppContent(c: AppContainer, p: UserPrefs) {
                     composable(Routes.SEARCH) { SearchScreen(c, nav) }
                     composable(Routes.PLANS) { PlansScreen(nav) }
                     composable(Routes.CONTACTS) { ContactsScreen(c, nav) }
+                    composable(Routes.CUSTOMIZE) { CustomizeScreen(c, nav) }
+                    composable(Routes.TIMER) { TimerScreen(c, nav) }
+                    composable(Routes.WEEKPLAN) { WeekPlanScreen(c, nav) }
+                    composable(Routes.IMPORT) { ImportScreen(c, nav) }
                 }
             }
             if (confettiKey != 0L) Confetti(confettiKey)
@@ -207,7 +216,7 @@ private fun androidx.navigation.NavGraphBuilder.tabRoute(route: String, content:
 private fun BottomBar(nav: NavHostController, route: String) {
     NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
         BOTTOM.forEach { item ->
-            val selected = route.startsWith(item.prefix) || (item.prefix == "more" && listOf("moving", "market", "furniture", "shared", "library", "guide", "achievements", "settings", "profile", "reminders", "calc", "search", "plans", "contacts").any { route.startsWith(it) })
+            val selected = route.startsWith(item.prefix) || (item.prefix == "more" && listOf("moving", "market", "furniture", "shared", "library", "guide", "achievements", "settings", "profile", "reminders", "calc", "search", "plans", "contacts", "customize", "timer", "weekplan", "import").any { route.startsWith(it) })
             NavigationBarItem(
                 selected = selected,
                 onClick = {

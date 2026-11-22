@@ -67,15 +67,21 @@ class TourTest {
             repeat(5) { tap("Pular esta pergunta") }
             shot("jornada-pronta")
             tap("Explorar com dados de exemplo")
-            Thread.sleep(1500)
-            shot("inicio"); scrollDown(); shot("inicio-2"); scrollDown(); shot("inicio-3")
+            Thread.sleep(2500)
+            shot("inicio"); scrollDown(); shot("inicio-2"); scrollDown(); shot("inicio-3"); scrollDown(); shot("inicio-4")
             tap("Jornada"); shot("jornada")
-            tap("Finanças"); shot("financas")
+            tap("Finanças"); shot("financas"); scrollDown(); shot("financas-2")
+            tap("Cartões"); shot("cartoes")
+            tap("Cofrinhos"); shot("cofrinhos")
             tap("Casa"); shot("casa")
+            tap("Plano da semana", substring = true); shot("plano-semana"); back()
             tap("Mais"); shot("mais")
+            tap("Faxina cronometrada"); shot("faxina"); back()
+            tap("Importar extrato"); shot("importar"); back()
+            tap("Personalizar o Início"); shot("personalizar"); back()
             tap("Dicas e guias"); shot("biblioteca")
             tap("Segurança doméstica", substring = true); shot("categoria")
-            tap("Como agir em caso de vazamento de gás"); shot("guia"); scrollDown(); shot("guia-2")
+            tap("Como agir em caso de vazamento de gás"); shot("guia")
         }
     }
 }

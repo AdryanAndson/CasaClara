@@ -2,4 +2,10 @@
     <style name="Theme.CasaClara" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/papel</item>
     </style>
+    <!-- Tela de abertura (Android 8 em diante, via core-splashscreen) -->
+    <style name="Theme.CasaClara.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/papel</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.CasaClara</item>
+    </style>
 </resources>

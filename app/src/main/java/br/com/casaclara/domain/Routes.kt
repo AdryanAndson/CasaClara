@@ -23,6 +23,10 @@ object Routes {
     const val SEARCH = "search"
     const val PLANS = "plans"
     const val CONTACTS = "contacts"
+    const val CUSTOMIZE = "customize"
+    const val TIMER = "timer"
+    const val WEEKPLAN = "weekplan"
+    const val IMPORT = "import"
 
     fun finance(tab: Int = 0) = "finance?tab=$tab"
     fun house(tab: Int = 0) = "house?tab=$tab"
@@ -34,7 +38,7 @@ object Routes {
     fun calc(id: String) = "calc/$id"
 
     // Índices das abas (mantidos aqui para a jornada e a busca apontarem para o lugar certo)
-    object FinanceTab { const val RESUMO = 0; const val LANCAMENTOS = 1; const val CONTAS = 2; const val DIVIDAS = 3; const val ORCAMENTO = 4; const val METAS = 5; const val RELATORIOS = 6 }
+    object FinanceTab { const val RESUMO = 0; const val LANCAMENTOS = 1; const val CONTAS = 2; const val CARTOES = 3; const val RECORRENTES = 4; const val DIVIDAS = 5; const val ORCAMENTO = 6; const val METAS = 7; const val RELATORIOS = 8 }
     object HouseTab { const val TAREFAS = 0; const val LIMPEZA = 1; const val CALENDARIO = 2; const val COMPRAS = 3; const val INVENTARIO = 4; const val GARANTIAS = 5 }
     object MovingTab { const val CHECKLIST = 0; const val CRONOGRAMA = 1; const val DOCUMENTOS = 2; const val CUSTOS = 3; const val VISITA = 4; const val IMOVEIS = 5; const val PERGUNTAS = 6 }
     object MarketTab { const val LISTA = 0; const val FAVORITOS = 1; const val CARDAPIO = 2; const val DESPENSA = 3; const val RECEITAS = 4 }

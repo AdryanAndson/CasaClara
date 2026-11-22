@@ -116,6 +116,25 @@ object ReminderScheduler {
         }
     }
 
+    // ---------- timer da faxina ----------
+    private const val TIMER_WORK = "faxina-timer"
+    fun scheduleTimerDone(context: Context, delayMs: Long, room: String) {
+        val req = OneTimeWorkRequestBuilder<TimerWorker>().setInitialDelay(delayMs.coerceAtLeast(0), TimeUnit.MILLISECONDS)
+            .setInputData(workDataOf("room" to room)).build()
+        WorkManager.getInstance(context).enqueueUniqueWork(TIMER_WORK, ExistingWorkPolicy.REPLACE, req)
+    }
+    fun cancelTimer(context: Context) = WorkManager.getInstance(context).cancelUniqueWork(TIMER_WORK)
+
+    class TimerWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
+        override suspend fun doWork(): Result {
+            val app = applicationContext as CasaClaraApp
+            if (app.container.prefs.current().notifications) {
+                show(applicationContext, 999_001, "Faxina concluída! ✨", "Tempo de ${inputData.getString("room") ?: "faxina"} acabou. Pode descansar — você mandou bem.")
+            }
+            return Result.success()
+        }
+    }
+
     /** Reagenda tudo (ao abrir o app ou após restaurar backup). */
     suspend fun rescheduleAll(context: Context, list: List<ReminderEntity>) = list.forEach { schedule(context, it) }
 }

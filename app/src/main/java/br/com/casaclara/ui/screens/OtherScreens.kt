@@ -84,6 +84,8 @@ import br.com.casaclara.ui.components.Tone
 import br.com.casaclara.ui.components.opts
 import br.com.casaclara.ui.billStatus
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.util.Date
 import kotlin.system.exitProcess
@@ -243,7 +245,7 @@ fun SettingsScreen(c: AppContainer, nav: NavController) {
         SectionTitle("Jornada")
         SecondaryButton("↺ Reiniciar jornada (mantém os registros)", Modifier.fillMaxWidth()) {
             confirm.ask("Reiniciar a jornada?", "Você responde as perguntas iniciais de novo. Finanças, listas e demais registros NÃO são apagados.", "Reiniciar", danger = false) {
-                scope.launch { c.restartJourney(); nav.navigate(Routes.ONBOARDING) { popUpTo(0) { inclusive = true } } }
+                scope.launch { c.restartJourney(); withContext(Dispatchers.Main) { nav.navigate(Routes.ONBOARDING) { popUpTo(0) { inclusive = true } } } }
             }
         }
         SecondaryButton("Limpar histórico de leitura dos guias", Modifier.fillMaxWidth()) {

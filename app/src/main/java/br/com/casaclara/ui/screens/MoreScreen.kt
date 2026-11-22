@@ -30,6 +30,9 @@ fun MoreScreen(@Suppress("UNUSED_PARAMETER") c: AppContainer, nav: NavController
             Entry("🛒", "Mercado e alimentação", "Lista, favoritos, cardápio, despensa, receitas", Routes.market(0)),
             Entry("🛋️", "Móveis e compras", "Essenciais, prioridades, comparação, parcelas", Routes.furniture(0)),
             Entry("🧑‍🤝‍🧑", "Casa compartilhada", "Moradores, despesas, reembolsos, acordos", Routes.shared(0)),
+            Entry("🗓️", "Plano da semana", "Tarefas distribuídas pelos dias", Routes.WEEKPLAN),
+            Entry("⏱️", "Faxina cronometrada", "Escolha um cômodo e um tempo", Routes.TIMER),
+            Entry("📥", "Importar extrato", "Traga lançamentos do banco (CSV)", Routes.IMPORT),
             Entry("🧮", "Calculadoras", "Custo de vida, mudança, renda, metas, transporte", Routes.CALCULATORS),
             Entry("📇", "Contatos e emergência", "Profissionais, emergência, endereços importantes", Routes.CONTACTS),
             Entry("🔔", "Lembretes", "Contas, tarefas, metas, mudança, manutenção", Routes.REMINDERS),
@@ -41,6 +44,7 @@ fun MoreScreen(@Suppress("UNUSED_PARAMETER") c: AppContainer, nav: NavController
         ),
         "Você" to listOf(
             Entry("🙂", "Perfil", "Sua situação, objetivos e jornada", Routes.PROFILE),
+            Entry("🎛️", "Personalizar o Início", "Cartões, ordem e atalhos", Routes.CUSTOMIZE),
             Entry("⚙️", "Configurações", "Tema, texto, notificações, dados e backup", Routes.SETTINGS),
             Entry("⭐", "Planos", "Gratuito e o que vem por aí", Routes.PLANS),
         ),

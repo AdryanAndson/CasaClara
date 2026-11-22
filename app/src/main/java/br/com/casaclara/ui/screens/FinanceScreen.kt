@@ -16,6 +16,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -90,7 +93,7 @@ import br.com.casaclara.ui.theme.Brand
 import br.com.casaclara.ui.theme.LocalSoft
 import kotlinx.coroutines.launch
 
-private val TABS = listOf("Resumo", "Lançamentos", "Contas", "Dívidas", "Orçamento", "Metas", "Relatórios")
+private val TABS = listOf("Resumo", "Lançamentos", "Contas", "Cartões", "Recorrentes", "Dívidas", "Orçamento", "Cofrinhos", "Relatórios")
 private val INCOME_TYPES = listOf("FIXA" to "Fixa (salário, bolsa…)", "VARIAVEL" to "Variável (comissão, freela…)", "INFORMAL" to "Informal (bico, vendas…)")
 
 @Composable
@@ -103,11 +106,13 @@ fun FinanceScreen(c: AppContainer, nav: NavController, initialTab: Int) {
         Tabs(TABS, tab) { tab = it }
         when (tab) {
             0 -> ResumoTab(c) { tab = it }
-            1 -> LancamentosTab(c)
+            1 -> LancamentosTab(c, nav)
             2 -> ContasTab(c)
-            3 -> DividasTab(c)
-            4 -> OrcamentoTab(c)
-            5 -> MetasTab(c, nav)
+            3 -> CartoesTab(c)
+            4 -> RecorrentesTab(c)
+            5 -> DividasTab(c)
+            6 -> OrcamentoTab(c)
+            7 -> MetasTab(c, nav)
             else -> RelatoriosTab(c)
         }
     }
@@ -169,8 +174,10 @@ fun MonthSwitcher(month: Int, onChange: (Int) -> Unit) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun LancamentosTab(c: AppContainer) {
+private fun LancamentosTab(c: AppContainer, nav: NavController) {
     val tx by c.db.tx().all().asState(emptyList())
+    val cards by c.db.cards().all().asState(emptyList())
+    val cardOpts = listOf("" to "Não foi no cartão") + cards.map { it.id.toString() to "💳 ${it.name}" }
     var kind by rememberSaveable { mutableStateOf("TODOS") }
     var period by rememberSaveable { mutableStateOf("MES") }
     var cat by rememberSaveable { mutableStateOf("") }
@@ -181,6 +188,7 @@ private fun LancamentosTab(c: AppContainer) {
         (kind == "TODOS" || it.kind == kind) && (from == null || it.date >= from) && (to == null || it.date <= to) && (cat.isEmpty() || it.category == cat)
     }
     TabBody {
+        SecondaryButton("📥 Importar extrato do banco (CSV)", Modifier.fillMaxWidth()) { nav.navigate(Routes.IMPORT) }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             listOf("TODOS" to "Tudo", "ENTRADA" to "Entradas", "SAIDA" to "Gastos").forEach { (k, l) -> FilterChip(kind == k, { kind = k }, { Text(l) }) }
         }
@@ -202,21 +210,27 @@ private fun LancamentosTab(c: AppContainer) {
                 FieldSpec("category", "Categoria", FieldType.SELECT, true, opts((EXPENSE_CATEGORIES + INCOME_CATEGORIES).distinct())),
                 FieldSpec("incomeType", "Tipo de renda (para entradas)", FieldType.SELECT, options = listOf("" to "—") + INCOME_TYPES),
                 FieldSpec("payment", "Forma de pagamento", FieldType.SELECT, options = opts("", "Pix", "Débito", "Crédito", "Dinheiro", "Boleto")),
+                FieldSpec("card", "Cartão de crédito (para gastos)", FieldType.SELECT, options = cardOpts, help = if (cards.isEmpty()) "Cadastre cartões na aba Cartões." else "A compra entra na fatura certa automaticamente."),
+                FieldSpec("installments", "Parcelas no cartão", FieldType.INT, min = 1.0, max = 48.0, help = "O valor acima é o total da compra."),
             ),
             toForm = { t ->
                 if (t == null) mapOf("kind" to (if (kind == "ENTRADA") "ENTRADA" else "SAIDA"), "date" to Init.today(), "category" to "Outros")
-                else mapOf("kind" to t.kind, "description" to t.description, "amount" to Init.money(t.amount), "date" to Init.date(t.date), "category" to t.category, "incomeType" to (t.incomeType ?: ""), "payment" to (t.payment ?: ""))
+                else mapOf("kind" to t.kind, "description" to t.description, "amount" to Init.money(t.amount), "date" to Init.date(t.date), "category" to t.category, "incomeType" to (t.incomeType ?: ""), "payment" to (t.payment ?: ""), "card" to (t.cardId?.toString() ?: ""), "installments" to t.installments.toString())
             },
             save = { d, old ->
                 val k = d.str("kind")
                 c.db.tx().upsert(TxEntity(id = old?.id ?: 0, kind = k, description = d.str("description"), amount = d.money("amount")!!, date = d.date("date")!!,
-                    category = d.str("category"), incomeType = if (k == "ENTRADA") d.text("incomeType") ?: "FIXA" else null, payment = d.text("payment"), isDemo = old?.isDemo ?: false))
+                    category = d.str("category"), incomeType = if (k == "ENTRADA") d.text("incomeType") ?: "FIXA" else null,
+                    payment = if (k == "SAIDA" && d.text("card") != null) "Crédito" else d.text("payment"), isDemo = old?.isDemo ?: false,
+                    cardId = if (k == "SAIDA") d.text("card")?.toLongOrNull() else null, installments = (d.int("installments") ?: 1).coerceIn(1, 48), recurringId = old?.recurringId))
             },
             delete = { c.db.tx().delete(it) },
             row = { t ->
                 RowSpec(
                     title = t.description,
-                    subtitle = "${Dates.br(t.date)} · ${t.category}${t.payment?.let { " · $it" } ?: ""}",
+                    subtitle = "${Dates.br(t.date)} · ${t.category}${t.payment?.let { " · $it" } ?: ""}" +
+                        (t.cardId?.let { id -> " · 💳 " + (cards.firstOrNull { it.id == id }?.name ?: "cartão") + if (t.installments > 1) " em ${t.installments}x" else "" } ?: "") +
+                        (if (t.recurringId != null) " · 🔁 automático" else ""),
                     amount = (if (t.kind == "ENTRADA") "+ " else "− ") + Money.format(t.amount),
                     tags = if (t.incomeType != null) { { Tag(INCOME_TYPES.firstOrNull { it.first == t.incomeType }?.second?.substringBefore(" (") ?: "Entrada", Tone.VERDE) } } else null,
                 )
@@ -428,8 +442,8 @@ private fun MetasTab(c: AppContainer, nav: NavController) {
     val prefs by c.prefs.flow.asState(UserPrefs())
     val scope = rememberCoroutineScope()
     val fb = LocalFeedback.current
-    var deposit by remember { mutableStateOf<GoalEntity?>(null) }
-    var depValue by remember { mutableStateOf("") }
+    var move by remember { mutableStateOf<Pair<GoalEntity, String>?>(null) }
+    var historyOf by remember { mutableStateOf<Long?>(null) }
     // custo de vida de referência: calculadora ou média dos gastos dos últimos 3 meses
     val calc = prefs.calc["custo"].orEmpty()
     val calcTotal = calc.values.sumOf { Money.parse(it)?.coerceAtLeast(0) ?: 0 }
@@ -439,10 +453,19 @@ private fun MetasTab(c: AppContainer, nav: NavController) {
         if (months.isEmpty()) 0L to "" else saidas.filter { Dates.monthKey(it.date) in months }.sumOf { it.amount } / months.size to "pela média dos seus gastos"
     }
     TabBody {
+        if (goals.isNotEmpty()) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            goals.forEach { g ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(88.dp)) {
+                    Jar(if (g.target > 0) g.saved.toFloat() / g.target else 0f, 72.dp, g.name)
+                    Text(g.name, style = MaterialTheme.typography.labelMedium, maxLines = 2, textAlign = TextAlign.Center)
+                }
+            }
+        }
+        Text("Toque num cofrinho da lista para ver o histórico.", style = MaterialTheme.typography.bodySmall)
         CrudList(
             items = goals,
             itemName = "meta",
-            title = "Metas e reserva de emergência", description = "A reserva de emergência (dinheiro só para imprevistos) é a meta mais importante.",
+            title = "Cofrinhos (metas e reserva)", description = "Um cofrinho para cada objetivo. A reserva de emergência (dinheiro só para imprevistos) é o mais importante.",
             fields = listOf(
                 FieldSpec("name", "Nome da meta", required = true, placeholder = "Ex.: Reserva de emergência"),
                 FieldSpec("type", "Tipo", FieldType.SELECT, options = listOf("RESERVA" to "Reserva de emergência", "MUDANCA" to "Mudança", "COMPRA" to "Compra", "OUTRO" to "Outro")),
@@ -474,8 +497,18 @@ private fun MetasTab(c: AppContainer, nav: NavController) {
                     tags = {
                         ProgressLine(r.progresso.toFloat(), "Progresso de ${g.name}", if (g.type == "RESERVA") Brand.Azul else Brand.Verde, Modifier.fillMaxWidth())
                         Tag(when (g.type) { "RESERVA" -> "Reserva"; "MUDANCA" -> "Mudança"; "COMPRA" -> "Compra"; else -> "Outro" }, if (g.type == "RESERVA") Tone.AZUL else Tone.VERDE)
+                        if (historyOf == g.id) Column(Modifier.fillMaxWidth()) { GoalHistory(c, g) }
                     },
-                    extra = { TextButton(onClick = { deposit = g; depValue = Money.toInput(g.monthly) }) { Text("+ Guardar") } },
+                    onClick = { historyOf = if (historyOf == g.id) null else g.id },
+                    extra = {
+                        Column {
+                            TextButton(onClick = { move = g to "GUARDAR" }) { Text("+ Guardar") }
+                            Row {
+                                TextButton(onClick = { move = g to "RETIRAR" }, enabled = g.saved > 0) { Text("−") }
+                                TextButton(onClick = { move = g to "TRANSFERIR" }, enabled = g.saved > 0 && goals.size > 1) { Text("↔") }
+                            }
+                        }
+                    },
                 )
             },
             empty = EmptySpec("Nenhuma meta ainda", "Que tal começar pela reserva de emergência? Qualquer valor conta."),
@@ -495,28 +528,7 @@ private fun MetasTab(c: AppContainer, nav: NavController) {
             fb.toast("Lembrete mensal criado. Ajuste o dia em Lembretes.", Mood.DICA)
         }
     }
-    val g = deposit
-    if (g != null) {
-        AlertDialog(
-            onDismissRequest = { deposit = null },
-            title = { Text("Guardar em \"${g.name}\"") },
-            text = {
-                Column {
-                    MoneyInput("Quanto você guardou agora?", depValue, { depValue = it })
-                    Text("Isso só atualiza o acompanhamento — o Casa Clara não movimenta dinheiro.", style = MaterialTheme.typography.bodySmall)
-                }
-            },
-            confirmButton = {
-                Button(enabled = (Money.parse(depValue) ?: 0) > 0, onClick = {
-                    val v = Money.parse(depValue) ?: 0
-                    scope.launch { c.depositGoal(g, v) }
-                    fb.celebrate(if (g.saved + v >= g.target) "Meta batida! Você é demais! 🎉" else "+${Money.format(v)} guardado. Boa!")
-                    deposit = null
-                }) { Text("Guardar") }
-            },
-            dismissButton = { TextButton(onClick = { deposit = null }) { Text("Cancelar") } },
-        )
-    }
+    move?.let { (g, mode) -> GoalMoveDialog(c, g, goals, mode) { move = null } }
 }
 
 @Composable
