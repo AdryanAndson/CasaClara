@@ -80,7 +80,6 @@ private val AppTypography = Typography().let { t ->
         bodyMedium = t.bodyMedium.body().copy(fontSize = 15.sp, lineHeight = 22.sp),
         bodySmall = t.bodySmall.body().copy(fontSize = 14.sp, lineHeight = 20.sp),
         labelLarge = t.labelLarge.copy(fontFamily = Nunito, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp),
-        labelMedium = t.labelMedium.copy(fontFamily = Nunito, fontWeight = FontWeight.Bold),
         labelSmall = t.labelSmall.copy(fontFamily = Nunito, fontWeight = FontWeight.Bold, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.2.sp),
         labelMedium = t.labelMedium.copy(fontFamily = Nunito, fontWeight = FontWeight.Bold, fontSize = 13.sp, letterSpacing = 0.15.sp),
     )
