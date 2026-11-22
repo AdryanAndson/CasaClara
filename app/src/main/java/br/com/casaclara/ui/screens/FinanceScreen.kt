@@ -497,10 +497,11 @@ private fun MetasTab(c: AppContainer, nav: NavController) {
                     tags = {
                         ProgressLine(r.progresso.toFloat(), "Progresso de ${g.name}", if (g.type == "RESERVA") Brand.Azul else Brand.Verde, Modifier.fillMaxWidth())
                         Tag(when (g.type) { "RESERVA" -> "Reserva"; "MUDANCA" -> "Mudança"; "COMPRA" -> "Compra"; else -> "Outro" }, if (g.type == "RESERVA") Tone.AZUL else Tone.VERDE)
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            TextButton(onClick = { move = g to "GUARDAR" }) { Text("+ Guardar") }
-                            TextButton(onClick = { move = g to "RETIRAR" }, enabled = g.saved > 0) { Text("− Retirar") }
-                            if (goals.size > 1) TextButton(onClick = { move = g to "TRANSFERIR" }, enabled = g.saved > 0) { Text("↔ Mover") }
+                        val pad = androidx.compose.foundation.layout.PaddingValues(horizontal = 6.dp)
+                        Row(Modifier.fillMaxWidth()) {
+                            TextButton(onClick = { move = g to "GUARDAR" }, contentPadding = pad) { Text("+ Guardar", maxLines = 1, softWrap = false) }
+                            TextButton(onClick = { move = g to "RETIRAR" }, enabled = g.saved > 0, contentPadding = pad) { Text("− Retirar", maxLines = 1, softWrap = false) }
+                            if (goals.size > 1) TextButton(onClick = { move = g to "TRANSFERIR" }, enabled = g.saved > 0, contentPadding = pad) { Text("↔ Mover", maxLines = 1, softWrap = false) }
                         }
                         if (historyOf == g.id) Column(Modifier.fillMaxWidth()) { GoalHistory(c, g) }
                     },
