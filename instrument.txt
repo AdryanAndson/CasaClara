@@ -1,0 +1,8 @@
+
+br.com.casaclara.TourTest:.
+
+Time: 66.392
+
+OK (1 test)
+
+
