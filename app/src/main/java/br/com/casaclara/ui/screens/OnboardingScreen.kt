@@ -112,6 +112,8 @@ fun OnboardingScreen(c: AppContainer, onDone: (String) -> Unit) {
 
     fun finish(demo: Boolean) = scope.launch {
         val inc = Money.parse(income); val sav = Money.parse(saved); val mg = Money.parse(moveGoal)
+        // Exemplos ANTES de marcar como concluído: ao marcar, a tela de boas-vindas sai e o escopo dela é cancelado.
+        if (demo) kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) { c.loadDemo() }
         c.prefs.update {
             it.copy(onboarded = true, onboardingStep = 0, name = name.trim(), situation = situation, goal = goal, interests = interests, income = inc, saved = sav, moveGoal = mg)
         }
@@ -122,7 +124,6 @@ fun OnboardingScreen(c: AppContainer, onDone: (String) -> Unit) {
         if (createGoal && mg != null && mg > 0 && c.db.goals().all().first().none { it.name == "Meta de mudança" }) {
             c.db.goals().upsert(GoalEntity(name = "Meta de mudança", type = "MUDANCA", target = mg, saved = sav ?: 0))
         }
-        if (demo) c.loadDemo()
         withContext(Dispatchers.Main) {
             feedback.celebrate("Bem-vindo(a) ao Casa Clara!")
             onDone(Routes.HOME)

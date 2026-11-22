@@ -1,5 +1,7 @@
 package br.com.casaclara.data
 
+import androidx.room.withTransaction
+
 import android.content.Context
 import android.net.Uri
 import br.com.casaclara.domain.Achievements
@@ -163,8 +165,11 @@ class AppContainer(val context: Context) {
 
     // ------------------- dados de demonstração -------------------
     suspend fun loadDemo() {
-        DemoData.load(db, Dates.today())
-        prefs.update { it.copy(demoLoaded = true) }
+        kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) {
+            // uma transação só: mais rápido e tudo-ou-nada
+            db.withTransaction { DemoData.load(db, Dates.today()) }
+            prefs.update { it.copy(demoLoaded = true) }
+        }
     }
 
     suspend fun removeDemo() {
