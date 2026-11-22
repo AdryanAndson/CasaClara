@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Casa Clara</string>
     <string name="widget_desc">Tarefas de hoje, próximas contas e saldo do mês</string>
+    <string name="sc_gasto">Lançar gasto</string>
+    <string name="sc_gasto_long">Lançar um gasto ou entrada</string>
+    <string name="sc_tarefa">Tarefas</string>
+    <string name="sc_tarefa_long">Tarefas da casa</string>
+    <string name="sc_mercado">Mercado</string>
+    <string name="sc_mercado_long">Lista de mercado</string>
+    <string name="sc_emergencia">Emergência</string>
+    <string name="sc_emergencia_long">Números de emergência</string>
 </resources>

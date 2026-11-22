@@ -24,6 +24,10 @@ class CasaClaraApp : Application() {
         container.scope.launch {
             runCatching { container.runRecurring() }
             runCatching { ReminderScheduler.rescheduleAll(this@CasaClaraApp, container.db.reminders().enabled()) }
+            runCatching {
+                val st = br.com.casaclara.data.AppSettings.from(container.prefs.current().calc[br.com.casaclara.data.AppSettings.KEY].orEmpty())
+                br.com.casaclara.notifications.WeeklySummary.schedule(this@CasaClaraApp, st.weeklySummary)
+            }
         }
         // Mantém o widget da tela inicial atualizado (com intervalo para não pesar a bateria).
         container.scope.launch {

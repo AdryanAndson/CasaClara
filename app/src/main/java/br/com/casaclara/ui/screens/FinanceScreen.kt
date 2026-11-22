@@ -1,5 +1,9 @@
 package br.com.casaclara.ui.screens
 
+import br.com.casaclara.data.RecurringEntity
+
+import br.com.casaclara.domain.Forecast
+
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -110,7 +114,7 @@ fun FinanceScreen(c: AppContainer, nav: NavController, initialTab: Int) {
             2 -> ContasTab(c)
             3 -> CartoesTab(c)
             4 -> RecorrentesTab(c)
-            5 -> DividasTab(c)
+            5 -> DividasTab(c, nav)
             6 -> OrcamentoTab(c)
             7 -> MetasTab(c, nav)
             else -> RelatoriosTab(c)
@@ -123,6 +127,8 @@ private fun List<TxEntity>.movs(kind: String) = filter { it.kind == kind }.map {
 @Composable
 private fun ResumoTab(c: AppContainer, goTab: (Int) -> Unit) {
     val tx by c.db.tx().all().asState(emptyList())
+    val recs by c.db.recurring().all().asState(emptyList())
+    val bills by c.db.bills().all().asState(emptyList())
     var month by rememberSaveable { mutableIntStateOf(Dates.currentMonthKey()) }
     val fb = LocalFeedback.current
     val scope = rememberCoroutineScope()
@@ -156,10 +162,35 @@ private fun ResumoTab(c: AppContainer, goTab: (Int) -> Unit) {
                 if (cmp.diferenca > 0) "DICA" else "OK",
             )
         }
+        if (month == Dates.currentMonthKey() && sum.entrou + sum.saiu > 0) ForecastCard(tx, recs, bills, month)
         SectionTitle("Para onde foi o dinheiro")
         if (cats.isEmpty()) Text("Sem gastos neste mês.", color = MaterialTheme.colorScheme.onSurfaceVariant) else Bars(cats, Money::format)
         SecondaryButton("⬇ Exportar planilha (CSV)", Modifier.fillMaxWidth(), enabled = tx.isNotEmpty()) { export.launch("casa-clara-financas-${Dates.today()}.csv") }
         Text("O arquivo é salvo onde você escolher. Nada é enviado para a internet.", style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+/** Previsão do saldo no fim do mês: o que já aconteceu + o que está agendado + o ritmo dos gastos do dia a dia. */
+@Composable
+private fun ForecastCard(tx: List<TxEntity>, recs: List<RecurringEntity>, bills: List<BillEntity>, month: Int) {
+    val today = Dates.today()
+    val ym = Dates.yearMonth(month)
+    val mine = tx.filter { Dates.monthKey(it.date) == month && it.date <= today.toEpochDay() }
+    val entrou = mine.filter { it.kind == "ENTRADA" }.sumOf { it.amount }
+    val saidas = mine.filter { it.kind == "SAIDA" }
+    val variavel = saidas.filter { it.recurringId == null }.sumOf { it.amount }
+    val pend = recs.filter { it.active && (it.lastGenerated ?: 0) < month && it.day > today.dayOfMonth && it.startMonth <= month }
+    val r = Forecast.endOfMonth(entrou, saidas.sumOf { it.amount }, variavel,
+        pend.filter { it.kind == "ENTRADA" }.sumOf { it.amount }, pend.filter { it.kind == "SAIDA" }.sumOf { it.amount },
+        bills.filter { it.paidMonth != month && it.dueDay > today.dayOfMonth }.sumOf { it.amount ?: 0 }, today.dayOfMonth, ym.lengthOfMonth())
+    BrandCard(tone = if (r.previsto >= 0) Tone.AZUL else Tone.CORAL, padding = 12.dp) {
+        Text("🔮 Previsão para o fim do mês", style = MaterialTheme.typography.titleMedium)
+        Stat("Deve sobrar", Money.format(r.previsto), color = if (r.previsto < 0) MaterialTheme.colorScheme.error else Brand.VerdeEscuro)
+        Text("Saldo hoje ${Money.format(r.saldoAgora)}" +
+            (if (r.entradasPrevistas > 0) " + a receber ${Money.format(r.entradasPrevistas)}" else "") +
+            (if (r.fixosPrevistos + r.contasAPagar > 0) " − fixos e contas ${Money.format(r.fixosPrevistos + r.contasAPagar)}" else "") +
+            " − dia a dia ${Money.format(r.variavelRestante)} (${Money.format(r.gastoVariavelPorDia)}/dia × ${r.diasRestantes} dias).", style = MaterialTheme.typography.bodySmall)
+        if (r.previsto < 0) Text("No ritmo atual, o mês fecha no vermelho. Segurar ${Money.format(-r.previsto / r.diasRestantes.coerceAtLeast(1))} por dia resolve.", fontWeight = FontWeight.Bold)
     }
 }
 
@@ -308,13 +339,14 @@ private fun ContasTab(c: AppContainer) {
 }
 
 @Composable
-private fun DividasTab(c: AppContainer) {
+private fun DividasTab(c: AppContainer, nav: NavController) {
     val debts by c.db.debts().all().asState(emptyList())
     val scope = rememberCoroutineScope()
     val fb = LocalFeedback.current
     val restante = debts.sumOf { Finance.debtRemaining(it.installment, it.total, it.paid).valor }
     val mensal = debts.filter { it.paid < it.total }.sumOf { it.installment }
     TabBody {
+        SecondaryButton("⛓️ Simular plano para quitar (bola de neve × avalanche)", Modifier.fillMaxWidth()) { nav.navigate(Routes.calc("quitar")) }
         if (debts.isNotEmpty()) Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             BrandCard(Modifier.weight(1f), padding = 12.dp) { Stat("Falta pagar", Money.format(restante)) }
             BrandCard(Modifier.weight(1f), padding = 12.dp) { Stat("Por mês", Money.format(mensal)) }
@@ -568,6 +600,22 @@ private fun RelatoriosTab(c: AppContainer) {
         SectionTitle("Gastos por categoria no período")
         val cats = Finance.byCategory(s, from, to)
         if (cats.isEmpty()) Text("Sem gastos no período.") else Bars(cats, Money::format)
+        val year = Dates.yearMonth(end).year
+        val ys = java.time.LocalDate.of(year, 1, 1).toEpochDay(); val ye = java.time.LocalDate.of(year, 12, 31).toEpochDay()
+        val inY = e.filter { it.epochDay in ys..ye }.sumOf { it.valor }; val outY = s.filter { it.epochDay in ys..ye }.sumOf { it.valor }
+        if (inY + outY > 0) {
+            SectionTitle("📅 Resumo de $year")
+            BrandCard(tone = Tone.AMARELO, padding = 12.dp) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Stat("Entrou", Money.format(inY), Modifier.weight(1f), Brand.VerdeEscuro)
+                    Stat("Saiu", Money.format(outY), Modifier.weight(1f))
+                }
+                Stat("Sobrou no ano", Money.format(inY - outY), color = if (inY - outY < 0) MaterialTheme.colorScheme.error else Brand.VerdeEscuro)
+                val mesesComDado = (1..12).count { m -> val k = year * 100 + m; s.any { Dates.monthKey(it.epochDay) == k } || e.any { Dates.monthKey(it.epochDay) == k } }.coerceAtLeast(1)
+                Text("Média de gastos por mês: ${Money.format(outY / mesesComDado)} · taxa de economia: ${if (inY > 0) "${((inY - outY) * 100 / inY)}%" else "—"}", style = MaterialTheme.typography.bodySmall)
+                Finance.byCategory(s, ys, ye).firstOrNull()?.let { Text("Maior categoria do ano: ${it.first} (${Money.format(it.second)})", fontWeight = FontWeight.Bold) }
+            }
+        }
         Spacer(Modifier.height(8.dp))
     }
 }

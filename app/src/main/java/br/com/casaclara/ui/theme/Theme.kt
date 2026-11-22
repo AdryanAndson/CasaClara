@@ -13,6 +13,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.runtime.remember
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -65,7 +66,9 @@ val Nunito = FontFamily(
     Font(R.font.nunito_bold, FontWeight.Bold), Font(R.font.nunito_extrabold, FontWeight.ExtraBold), Font(R.font.nunito_extrabold, FontWeight.Black),
 )
 
-private val AppTypography = Typography().let { t ->
+private fun appTypography(classic: Boolean) = Typography().let { t ->
+    val Baloo = if (classic) FontFamily.Default else Baloo
+    val Nunito = if (classic) FontFamily.Default else Nunito
     fun TextStyle.body() = copy(fontFamily = Nunito, letterSpacing = 0.1.sp)
     fun TextStyle.head(w: FontWeight) = copy(fontFamily = Baloo, fontWeight = w, letterSpacing = 0.sp)
     t.copy(
@@ -87,8 +90,19 @@ private val AppTypography = Typography().let { t ->
 /** Números grandes: dígitos com a mesma largura (tnum) para valores alinhados e sem "pular" ao mudar. */
 val BigNumber = TextStyle(fontFamily = Baloo, fontWeight = FontWeight.ExtraBold, fontSize = 28.sp, lineHeight = 32.sp, fontFeatureSettings = "tnum")
 
+/** Cores de destaque escolhidas nas configurações: (claro, contêiner claro, escuro, contêiner escuro). */
+val ACCENTS = linkedMapOf(
+    "VERDE" to listOf(0xFF137A52, 0xFFD9F5E8, 0xFF6FD8A8, 0xFF174A36),
+    "AZUL" to listOf(0xFF1F5FCF, 0xFFDFE9FF, 0xFF9DBBFF, 0xFF1F3561),
+    "ROXO" to listOf(0xFF6247D1, 0xFFEFE6FF, 0xFFC6B5FF, 0xFF3A2D66),
+    "CORAL" to listOf(0xFFC63D32, 0xFFFFE2DE, 0xFFFFB4A9, 0xFF5A2A25),
+    "ROSA" to listOf(0xFFB0336C, 0xFFFFE0EC, 0xFFFFB0CF, 0xFF5C2440),
+    "LARANJA" to listOf(0xFFB35300, 0xFFFFE6CC, 0xFFFFB77A, 0xFF5A3210),
+)
+val ACCENT_LABELS = mapOf("VERDE" to "Verde", "AZUL" to "Azul", "ROXO" to "Roxo", "CORAL" to "Coral", "ROSA" to "Rosa", "LARANJA" to "Laranja")
+
 @Composable
-fun CasaClaraTheme(mode: ThemeMode, textScale: Float, content: @Composable () -> Unit) {
+fun CasaClaraTheme(mode: ThemeMode, textScale: Float, accent: String = "VERDE", classicFont: Boolean = false, content: @Composable () -> Unit) {
     val dark = when (mode) { ThemeMode.SISTEMA -> isSystemInDarkTheme(); ThemeMode.CLARO -> false; ThemeMode.ESCURO -> true }
     val soft = if (dark) SoftColors(Color(0xFF173D2F), Color(0xFF41391A), Color(0xFF1E2F52), Color(0xFF4A2622), Color(0xFF33284A), Color(0xFF8C99A6))
     else SoftColors(Color(0xFFC4F1DC), Color(0xFFFFEDA6), Color(0xFFCFE0FF), Color(0xFFFFD3CC), Color(0xFFE6DBFF), Brand.Tinta)
@@ -99,8 +113,12 @@ fun CasaClaraTheme(mode: ThemeMode, textScale: Float, content: @Composable () ->
         LocalDensity provides Density(d.density, d.fontScale * textScale.coerceIn(0.85f, 1.6f)),
     ) {
         MaterialTheme(
-            colorScheme = if (dark) Dark else Light,
-            typography = AppTypography,
+            colorScheme = run {
+                val a = ACCENTS[accent] ?: ACCENTS.getValue("VERDE")
+                if (dark) Dark.copy(primary = Color(a[2]), primaryContainer = Color(a[3]))
+                else Light.copy(primary = Color(a[0]), primaryContainer = Color(a[1]))
+            },
+            typography = remember(classicFont) { appTypography(classicFont) },
             shapes = Shapes(small = RoundedCornerShape(10.dp), medium = RoundedCornerShape(16.dp), large = RoundedCornerShape(22.dp)),
             content = content,
         )

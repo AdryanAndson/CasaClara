@@ -7,8 +7,14 @@ import kotlin.math.roundToLong
  * Dinheiro é guardado em centavos (Long) para evitar erros de arredondamento.
  */
 object Money {
-    /** 123456 -> "R$ 1.234,56" */
-    fun format(cents: Long?): String {
+    /** Modo privacidade: quando verdadeiro, valores aparecem como "R$ •••••". A interface liga isso a um estado observável. */
+    @JvmStatic var masked: () -> Boolean = { false }
+
+    /** 123456 -> "R$ 1.234,56" (ou oculto, no modo privacidade) */
+    fun format(cents: Long?): String = if (masked()) "R$ •••••" else plain(cents)
+
+    /** Sempre o valor real (planilhas, campos de edição). */
+    fun plain(cents: Long?): String {
         val c = cents ?: 0L
         val neg = c < 0
         val a = abs(c)

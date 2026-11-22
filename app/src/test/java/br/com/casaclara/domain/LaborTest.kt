@@ -78,3 +78,30 @@ class HelpersTest {
         assertEquals(10, Quiz.draw(10, 1).size)
     }
 }
+
+class MoneyPlusTest {
+    @Test fun previsao() {
+        // dia 10 de 30: entrou 3000, saiu 1000 (500 variável) → 50/dia × 20 = 1000; + 200 a receber − 300 fixos − 100 contas
+        val r = Forecast.endOfMonth(300000, 100000, 50000, 20000, 30000, 10000, 10, 30)
+        assertEquals(5000L, r.gastoVariavelPorDia)
+        assertEquals(100000L, r.variavelRestante)
+        assertEquals(200000L + 20000 - 30000 - 10000 - 100000, r.previsto)
+    }
+
+    @Test fun dividas() {
+        val ds = listOf(DebtPlan.Debt("Cartão", 100000, 10.0, 10000), DebtPlan.Debt("Loja", 30000, 2.0, 5000))
+        val neve = DebtPlan.simulate(ds, 20000, DebtPlan.Method.BOLA_DE_NEVE)
+        val ava = DebtPlan.simulate(ds, 20000, DebtPlan.Method.AVALANCHE)
+        assertTrue(neve.feasible && ava.feasible)
+        assertEquals("Loja", neve.payoff.first().first)
+        assertEquals("Cartão", ava.payoff.first().first)
+        assertTrue(ava.totalInterest <= neve.totalInterest)
+        // parcela menor que os juros e sem extra: não quita
+        assertTrue(!DebtPlan.simulate(listOf(DebtPlan.Debt("X", 100000, 10.0, 5000)), 0, DebtPlan.Method.AVALANCHE).feasible)
+    }
+
+    @Test fun desafio52() {
+        assertEquals(137800L, Challenge52.total(100))
+        assertEquals(300L, Challenge52.saved(100, setOf(1, 2)))
+    }
+}

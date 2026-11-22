@@ -1,5 +1,11 @@
 package br.com.casaclara.ui.screens
 
+import androidx.compose.material3.FilterChip
+
+import androidx.compose.foundation.layout.FlowRow
+
+import androidx.compose.material3.OutlinedTextField
+
 import androidx.compose.material3.Switch
 
 import androidx.compose.foundation.layout.Arrangement
@@ -77,6 +83,8 @@ private val CALCS = listOf(
     CalcInfo("salario", "🧾", "Salário líquido (CLT ${Labor.YEAR})", "INSS, Imposto de Renda e vale-transporte."),
     CalcInfo("ferias", "🏖️", "Férias", "Valor das férias com 1/3 e venda de dias."),
     CalcInfo("decimo", "🎁", "13º salário", "Primeira e segunda parcela, com descontos."),
+    CalcInfo("quitar", "⛓️", "Plano para quitar dívidas", "Bola de neve × avalanche: ordem, prazo e juros."),
+    CalcInfo("desafio52", "🐷", "Desafio das 52 semanas", "Guarde um pouco mais a cada semana."),
 )
 
 @Composable
@@ -127,6 +135,8 @@ fun CalculatorScreen(c: AppContainer, nav: NavController, id: String) {
             "salario" -> SalarioCalc(c)
             "ferias" -> FeriasCalc(c)
             "decimo" -> DecimoCalc(c)
+            "quitar" -> DebtPlanCalc(c)
+            "desafio52" -> Challenge52Calc(c)
             else -> EmptyState("Calculadora não encontrada", "Volte e escolha outra.", Mood.CONFUSA)
         }
         Text("Estimativa baseada nos números informados. Não é garantia de resultado.", style = MaterialTheme.typography.bodySmall)
@@ -445,4 +455,81 @@ private fun DecimoCalc(c: AppContainer) {
     MoneyInput("Média de horas extras e adicionais (se houver)", v["medias"] ?: "", { set("medias", it) })
     NumberInput("Meses trabalhados no ano", v["meses"] ?: "12", { set("meses", it) }, help = "Conta o mês em que trabalhou 15 dias ou mais.")
     NumberInput("Dependentes para o Imposto de Renda", v["deps"] ?: "0", { set("deps", it) })
+}
+
+
+// ------------------------------------------------------------------ Quitar dívidas
+@Composable
+private fun DebtPlanCalc(c: AppContainer) {
+    val (v, set) = rememberCalc(c, "quitar") ?: return
+    val debts = (1..4).mapNotNull { i ->
+        val bal = m(v, "b$i") ?: return@mapNotNull null
+        if (bal <= 0) return@mapNotNull null
+        br.com.casaclara.domain.DebtPlan.Debt(v["n$i"]?.ifBlank { null } ?: "Dívida $i", bal, v["r$i"]?.replace(',', '.')?.toDoubleOrNull() ?: 0.0, m(v, "p$i") ?: 0)
+    }
+    val extra = m(v, "extra") ?: 0
+    if (debts.isNotEmpty()) {
+        val neve = br.com.casaclara.domain.DebtPlan.simulate(debts, extra, br.com.casaclara.domain.DebtPlan.Method.BOLA_DE_NEVE)
+        val ava = br.com.casaclara.domain.DebtPlan.simulate(debts, extra, br.com.casaclara.domain.DebtPlan.Method.AVALANCHE)
+        ResultCard {
+            if (!ava.feasible) {
+                Text("⚠️ Com esses valores a dívida não acaba: as parcelas não cobrem os juros.", fontWeight = FontWeight.Bold)
+                Text("Aumente o valor extra ou tente renegociar a taxa. Juros altos (cartão, cheque especial) são prioridade.", style = MaterialTheme.typography.bodySmall)
+            } else {
+                Stat("Livre das dívidas em", "${ava.months} ${if (ava.months == 1) "mês" else "meses"}")
+                listOf(ava to "🏔️ Avalanche (maior juros primeiro)", neve to "⛄ Bola de neve (menor saldo primeiro)").forEach { (r, label) ->
+                    Text(label, fontWeight = FontWeight.Black)
+                    Text("${r.months} meses · juros pagos ${Money.format(r.totalInterest)} · total ${Money.format(r.totalPaid)}", style = MaterialTheme.typography.bodySmall)
+                    Text("Ordem: " + r.payoff.joinToString(" → ") { "${it.first} (mês ${it.second})" }, style = MaterialTheme.typography.bodySmall)
+                }
+                val dif = neve.totalInterest - ava.totalInterest
+                Text(if (dif > 0) "A avalanche economiza ${Money.format(dif)} de juros. A bola de neve dá vitórias mais rápidas, o que ajuda a manter o ânimo." else "Os dois métodos dão praticamente o mesmo resultado aqui. Escolha o que te motiva mais.")
+            }
+        }
+    }
+    AlertBox("Informe o saldo devedor hoje, os juros ao mês e a parcela mínima de cada dívida. \"Extra\" é quanto a mais você consegue pagar por mês além das parcelas. Quando uma dívida acaba, a parcela dela vai para a próxima.", "INFO")
+    MoneyInput("Valor extra por mês", v["extra"] ?: "", { set("extra", it) })
+    (1..4).forEach { i ->
+        SectionTitle("Dívida $i")
+        OutlinedTextField(v["n$i"] ?: "", { set("n$i", it) }, label = { Text("Nome (ex.: cartão, empréstimo)") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MoneyInput("Saldo", v["b$i"] ?: "", { set("b$i", it) }, modifier = Modifier.weight(1f))
+            MoneyInput("Parcela mínima", v["p$i"] ?: "", { set("p$i", it) }, modifier = Modifier.weight(1f))
+        }
+        NumberInput("Juros ao mês", v["r$i"] ?: "", { set("r$i", it) }, suffix = "%")
+    }
+}
+
+// ------------------------------------------------------------------ Desafio das 52 semanas
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun Challenge52Calc(c: AppContainer) {
+    val (v, set) = rememberCalc(c, "desafio52") ?: return
+    val fb = br.com.casaclara.ui.components.LocalFeedback.current
+    val base = m(v, "base") ?: 0
+    val weeks = v["weeks"].orEmpty().split(',').mapNotNull { it.toIntOrNull() }.toSet()
+    val ch = br.com.casaclara.domain.Challenge52
+    ResultCard {
+        Stat("Guardado no desafio", Money.format(ch.saved(base, weeks)))
+        ProgressLine(weeks.size / 52f, "Semanas concluídas")
+        Text("${weeks.size} de 52 semanas · meta final ${Money.format(ch.total(base))}", style = MaterialTheme.typography.bodySmall)
+        val next = (1..52).firstOrNull { it !in weeks }
+        if (next != null && base > 0) Text("Próxima: semana $next → guarde ${Money.format(ch.deposit(base, next))}", fontWeight = FontWeight.Bold)
+    }
+    MoneyInput("Valor da semana 1", v["base"] ?: "", { set("base", it) }, help = "Na semana 2 você guarda o dobro, na 3 o triplo… Com R$ 5, chega a ${Money.format(ch.total(500))} no ano.")
+    if (base > 0) {
+        Text("Toque na semana quando guardar:", fontWeight = FontWeight.Bold)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            (1..52).forEach { w ->
+                val done = w in weeks
+                FilterChip(done, {
+                    val n = if (done) weeks - w else weeks + w
+                    set("weeks", n.sorted().joinToString(","))
+                    if (!done && n.size == 52) fb.celebrate("Desafio completo! ${Money.format(ch.total(base))} guardados! 🎉")
+                    else if (!done && n.size % 10 == 0) fb.celebrate("${n.size} semanas! Continua assim.")
+                }, { Text("$w") })
+            }
+        }
+        Text("Dica: dá para fazer ao contrário (começar pela semana 52) para pegar o pesado no início do ano.", style = MaterialTheme.typography.bodySmall)
+    }
 }

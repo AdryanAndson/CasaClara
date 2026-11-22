@@ -42,9 +42,10 @@ enum class Mood(val label: String) {
 @Composable
 fun rememberReduceMotion(): Boolean {
     val ctx = LocalContext.current
-    return remember {
+    val system = remember {
         runCatching { Settings.Global.getFloat(ctx.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f }.getOrDefault(false)
     }
+    return system || br.com.casaclara.ui.UiFlags.reduceMotion.value
 }
 
 @Composable

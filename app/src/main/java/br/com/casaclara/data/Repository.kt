@@ -66,7 +66,8 @@ class AppContainer(val context: Context) {
         val exp = d.expires
         if (exp != null) {
             val date = (exp - d.remindDays).coerceAtLeast(Dates.todayEpoch())
-            val r = ReminderEntity(id = rid ?: 0, title = "Vence em breve: ${d.name}", message = "Validade: ${Dates.br(exp)}. Hora de renovar.", kind = "OUTRO", date = date)
+            val minute = AppSettings.from(prefs.current().calc[AppSettings.KEY].orEmpty()).reminderMinute
+            val r = ReminderEntity(id = rid ?: 0, title = "Vence em breve: ${d.name}", message = "Validade: ${Dates.br(exp)}. Hora de renovar.", kind = "OUTRO", date = date, minuteOfDay = minute)
             val newId = db.reminders().upsert(r)
             if (rid == null) rid = newId
             br.com.casaclara.notifications.ReminderScheduler.schedule(context, r.copy(id = rid))

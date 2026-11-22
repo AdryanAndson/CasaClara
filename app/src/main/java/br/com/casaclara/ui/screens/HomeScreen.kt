@@ -1,5 +1,11 @@
 package br.com.casaclara.ui.screens
 
+import br.com.casaclara.data.settings
+
+import androidx.compose.material.icons.filled.VisibilityOff
+
+import androidx.compose.material.icons.filled.Visibility
+
 import androidx.compose.ui.unit.sp
 
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -107,7 +113,9 @@ fun HomeScreen(c: AppContainer, nav: NavController) {
     val log by remember(weekStart) { c.db.taskLog().since(weekStart) }.asState(emptyList(), weekStart)
     val planning = p.situation == Situation.PAIS || p.situation == Situation.JUNTANDO
     val d = HomeData(p, journeyOf(snap, p), tx, bills, tasks, goals, shop, unlocked.map { it.id }, log.size)
+    val simple = p.settings.simpleMode
     val order = HomeCatalog.resolve(p.homeOrder, planning).filter { it !in p.homeHidden }
+        .let { o -> if (simple) o.filter { it in setOf("proximo", "contas", "tarefas", "mercado", "atalhos") } else o }
 
     // entrada em cascata dos cartões (desligada se o sistema pede menos movimento)
     val reduce = rememberReduceMotion()
@@ -115,7 +123,7 @@ fun HomeScreen(c: AppContainer, nav: NavController) {
     LaunchedEffect(Unit) { if (!reduce) while (shown < 20) { delay(70); shown++ } }
 
     Page {
-        Hero(d, nav)
+        HeroWithC(c, d, nav)
         order.forEachIndexed { i, id ->
             AnimatedVisibility(visible = i < shown, enter = fadeIn() + slideInVertically { it / 3 }) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -138,6 +146,13 @@ fun HomeScreen(c: AppContainer, nav: NavController) {
     }
 }
 
+private val LocalAppContainer = androidx.compose.runtime.staticCompositionLocalOf<br.com.casaclara.data.AppContainer?> { null }
+
+@Composable
+private fun HeroWithC(c: br.com.casaclara.data.AppContainer, d: HomeData, nav: NavController) {
+    androidx.compose.runtime.CompositionLocalProvider(LocalAppContainer provides c) { Hero(d, nav) }
+}
+
 @Composable
 private fun Hero(d: HomeData, nav: NavController) {
     val month = Dates.currentMonthKey()
@@ -154,6 +169,12 @@ private fun Hero(d: HomeData, nav: NavController) {
             Column(Modifier.weight(1f)) {
                 Text("${greeting()}${if (d.p.name.isNotBlank()) ", ${d.p.name}" else ""}! 👋", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.semantics { heading() })
                 d.p.situation?.let { Text("Você está ${it.phrase}.", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold) }
+            }
+            val hidden = br.com.casaclara.ui.UiFlags.hideValues.value
+            val scopeH = rememberCoroutineScope()
+            val appC = LocalAppContainer.current
+            IconButton(onClick = { scopeH.launch { appC?.prefs?.setSetting("hideValues", !hidden) } }) {
+                Icon(if (hidden) Icons.Filled.VisibilityOff else Icons.Filled.Visibility, contentDescription = if (hidden) "Mostrar valores" else "Esconder valores")
             }
             IconButton(onClick = { nav.navigate(Routes.SEARCH) }) { Icon(Icons.Filled.Search, contentDescription = "Buscar no app") }
             IconButton(onClick = { nav.navigate(Routes.CUSTOMIZE) }) { Icon(Icons.Filled.Tune, contentDescription = "Personalizar o Início") }

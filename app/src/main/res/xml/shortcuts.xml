@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut android:shortcutId="lancar" android:enabled="true" android:icon="@drawable/ic_sc_gasto"
+        android:shortcutShortLabel="@string/sc_gasto" android:shortcutLongLabel="@string/sc_gasto_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="br.com.casaclara" android:targetClass="br.com.casaclara.MainActivity">
+            <extra android:name="route" android:value="finance?tab=1" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="tarefa" android:enabled="true" android:icon="@drawable/ic_sc_tarefa"
+        android:shortcutShortLabel="@string/sc_tarefa" android:shortcutLongLabel="@string/sc_tarefa_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="br.com.casaclara" android:targetClass="br.com.casaclara.MainActivity">
+            <extra android:name="route" android:value="house?tab=0" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="mercado" android:enabled="true" android:icon="@drawable/ic_sc_mercado"
+        android:shortcutShortLabel="@string/sc_mercado" android:shortcutLongLabel="@string/sc_mercado_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="br.com.casaclara" android:targetClass="br.com.casaclara.MainActivity">
+            <extra android:name="route" android:value="market?tab=0" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="emergencia" android:enabled="true" android:icon="@drawable/ic_sc_emergencia"
+        android:shortcutShortLabel="@string/sc_emergencia" android:shortcutLongLabel="@string/sc_emergencia_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="br.com.casaclara" android:targetClass="br.com.casaclara.MainActivity">
+            <extra android:name="route" android:value="emergency" />
+        </intent>
+    </shortcut>
+</shortcuts>

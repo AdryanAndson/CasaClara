@@ -1,5 +1,7 @@
 package br.com.casaclara.ui
 
+import br.com.casaclara.data.settings
+
 import br.com.casaclara.ui.components.cartoonShadow
 
 import androidx.compose.foundation.clickable
@@ -120,7 +122,7 @@ private val BOTTOM = listOf(
 )
 
 @Composable
-fun CasaClaraRoot(c: AppContainer) {
+fun CasaClaraRoot(c: AppContainer, pendingRoute: androidx.compose.runtime.MutableState<String?> = remember { mutableStateOf(null) }) {
     val prefs by c.prefs.flow.collectAsState(initial = null)
     val p = prefs
     if (p == null) {
@@ -132,22 +134,41 @@ fun CasaClaraRoot(c: AppContainer) {
         }
         return
     }
-    CasaClaraTheme(p.theme, p.textScale) { AppContent(c, p) }
+    val st = p.settings
+    // estados globais lidos durante a composição (valores ocultos, animações)
+    UiFlags.hideValues.value = st.hideValues
+    UiFlags.reduceMotion.value = !st.animations
+    UiFlags.confetti.value = st.confetti && st.animations
+    UiFlags.haptics.value = st.haptics
+    CasaClaraTheme(p.theme, p.textScale, st.accent, st.classicFont) {
+        LockGate(st.lock && p.onboarded) { AppContent(c, p, pendingRoute) }
+    }
 }
 
 @OptIn(kotlinx.coroutines.FlowPreview::class)
 @Composable
-private fun AppContent(c: AppContainer, p: UserPrefs) {
+private fun AppContent(c: AppContainer, p: UserPrefs, pendingRoute: androidx.compose.runtime.MutableState<String?>) {
     val nav = rememberNavController()
     val scope = rememberCoroutineScope()
     var toast by remember { mutableStateOf<Toast?>(null) }
     var confettiKey by remember { mutableStateOf(0L) }
     val confirm = remember { ConfirmState() }
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val feedback = remember {
         object : Feedback {
             override fun toast(message: String, mood: Mood) { toast = Toast(System.nanoTime(), message, mood) }
-            override fun celebrate(message: String) { toast = Toast(System.nanoTime(), message, Mood.COMEMORANDO); confettiKey = System.nanoTime() }
+            override fun celebrate(message: String) {
+                toast = Toast(System.nanoTime(), message, Mood.COMEMORANDO); confettiKey = System.nanoTime()
+                if (UiFlags.haptics.value) runCatching { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress) }
+            }
         }
+    }
+    // atalhos do ícone do app (segurar o ícone) abrem direto a tela certa
+    LaunchedEffect(pendingRoute.value, p.onboarded) {
+        val r = pendingRoute.value ?: return@LaunchedEffect
+        if (!p.onboarded) return@LaunchedEffect
+        pendingRoute.value = null
+        runCatching { nav.navigate(r) { launchSingleTop = true } }
     }
 
     // Conquistas: verifica a cada mudança nos dados e comemora as novas (a primeira leitura só registra).
@@ -179,7 +200,7 @@ private fun AppContent(c: AppContainer, p: UserPrefs) {
         Box(Modifier.fillMaxSize()) {
             Scaffold(
                 containerColor = MaterialTheme.colorScheme.background,
-                bottomBar = { if (showBottom) BottomBar(nav, route) },
+                bottomBar = { if (showBottom) BottomBar(nav, route, p.settings.simpleMode) },
             ) { pad ->
                 NavHost(nav, startDestination = if (p.onboarded) Routes.HOME else Routes.ONBOARDING, modifier = Modifier.padding(pad)) {
                     composable(Routes.ONBOARDING) { OnboardingScreen(c) { nav.navigate(it) { popUpTo(0) { inclusive = true } } } }
@@ -214,7 +235,7 @@ private fun AppContent(c: AppContainer, p: UserPrefs) {
                     composable(Routes.QUIZ) { br.com.casaclara.ui.screens.QuizScreen(c, nav) }
                 }
             }
-            if (confettiKey != 0L) Confetti(confettiKey)
+            if (confettiKey != 0L && UiFlags.confetti.value) Confetti(confettiKey)
             ToastHost(toast, { toast = null }, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = if (showBottom) 88.dp else 16.dp, start = 16.dp, end = 16.dp))
             ConfirmHost(confirm)
         }
@@ -226,9 +247,9 @@ private fun androidx.navigation.NavGraphBuilder.tabRoute(route: String, content:
 }
 
 @Composable
-private fun BottomBar(nav: NavHostController, route: String) {
+private fun BottomBar(nav: NavHostController, route: String, simple: Boolean = false) {
     NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
-        BOTTOM.forEach { item ->
+        BOTTOM.filter { !simple || it.prefix != "journey" }.forEach { item ->
             val selected = route.startsWith(item.prefix) || (item.prefix == "more" && listOf("moving", "market", "furniture", "shared", "library", "guide", "achievements", "settings", "profile", "reminders", "calc", "search", "plans", "contacts", "customize", "timer", "weekplan", "import", "emergency", "docs", "consumo", "golpe", "quiz").any { route.startsWith(it) })
             NavigationBarItem(
                 selected = selected,

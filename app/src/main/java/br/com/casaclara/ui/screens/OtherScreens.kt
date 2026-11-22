@@ -1,5 +1,23 @@
 package br.com.casaclara.ui.screens
 
+import androidx.compose.foundation.layout.padding
+
+import br.com.casaclara.ui.theme.LocalSoft
+
+import androidx.compose.foundation.layout.size
+
+import androidx.compose.foundation.layout.Box
+
+import androidx.compose.foundation.border
+
+import androidx.compose.foundation.background
+
+import androidx.compose.foundation.shape.CircleShape
+
+import androidx.compose.foundation.layout.FlowRow
+
+import br.com.casaclara.data.settings
+
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
@@ -116,6 +134,7 @@ private val REPEATS = listOf("NENHUM" to "Não repete", "DIARIO" to "Todo dia", 
 fun RemindersScreen(c: AppContainer, nav: NavController) {
     val items by c.db.reminders().all().asState(emptyList())
     val prefs by c.prefs.flow.asState(UserPrefs())
+    val defMinute = prefs.settings.reminderMinute
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     val fb = LocalFeedback.current
@@ -145,7 +164,7 @@ fun RemindersScreen(c: AppContainer, nav: NavController) {
                 FieldSpec("message", "Mensagem (opcional)"),
                 FieldSpec("enabled", "Ativado", FieldType.CHECK),
             ),
-            toForm = { r -> if (r == null) mapOf("kind" to "OUTRO", "date" to Init.today(), "time" to "09:00", "repeat" to "NENHUM", "enabled" to "1") else mapOf("title" to r.title, "kind" to r.kind, "date" to Init.date(r.date), "time" to "%02d:%02d".format(r.minuteOfDay / 60, r.minuteOfDay % 60), "repeat" to r.repeat, "message" to (r.message ?: ""), "enabled" to Init.bool(r.enabled)) },
+            toForm = { r -> if (r == null) mapOf("kind" to "OUTRO", "date" to Init.today(), "time" to "%02d:%02d".format(defMinute / 60, defMinute % 60), "repeat" to "NENHUM", "enabled" to "1") else mapOf("title" to r.title, "kind" to r.kind, "date" to Init.date(r.date), "time" to "%02d:%02d".format(r.minuteOfDay / 60, r.minuteOfDay % 60), "repeat" to r.repeat, "message" to (r.message ?: ""), "enabled" to Init.bool(r.enabled)) },
             save = { d, old ->
                 val r = ReminderEntity(id = old?.id ?: 0, title = d.str("title"), kind = d.str("kind"), date = d.date("date")!!, minuteOfDay = parseTime(d.str("time"))!!, repeat = d.str("repeat"), message = d.text("message"), enabled = d.bool("enabled"))
                 val id = c.db.reminders().upsert(r)
@@ -182,6 +201,7 @@ private fun parseTime(s: String): Int? {
 }
 
 // ------------------------------------------------------------------ Configurações
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(c: AppContainer, nav: NavController) {
     val p by c.prefs.flow.asState(UserPrefs())
@@ -218,11 +238,50 @@ fun SettingsScreen(c: AppContainer, nav: NavController) {
             valueRange = 0.85f..1.5f, steps = 12, modifier = Modifier.semantics { contentDescription = "Tamanho do texto" },
         )
         Text("Assim fica o texto do app. O tamanho de fonte do Android também é respeitado.", style = MaterialTheme.typography.bodySmall)
+        val st = p.settings
+        fun set(k: String, v: Boolean) { scope.launch { c.prefs.setSetting(k, v) } }
+        Text("Cor do app", fontWeight = FontWeight.Bold)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            br.com.casaclara.ui.theme.ACCENTS.forEach { (k, v) ->
+                val sel = st.accent == k
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.selectable(sel, role = Role.RadioButton) { scope.launch { c.prefs.setSetting("accent", k) } }.semantics { contentDescription = "Cor ${br.com.casaclara.ui.theme.ACCENT_LABELS[k]}" }) {
+                    Box(Modifier.size(44.dp).background(androidx.compose.ui.graphics.Color(v[0]), CircleShape).border(if (sel) 4.dp else 2.dp, LocalSoft.current.contorno, CircleShape), contentAlignment = Alignment.Center) {
+                        if (sel) Text("✓", color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Black)
+                    }
+                    Text(br.com.casaclara.ui.theme.ACCENT_LABELS[k] ?: k, style = MaterialTheme.typography.labelSmall)
+                }
+            }
+        }
+        Text("Estilo das letras", fontWeight = FontWeight.Bold)
+        listOf(false to "Divertidas (Baloo e Nunito)", true to "Clássicas (as do seu celular, mais sóbrias)").forEach { (v, l) ->
+            Row(Modifier.fillMaxWidth().selectable(st.classicFont == v, role = Role.RadioButton) { set("classicFont", v) }, verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = st.classicFont == v, onClick = null); Text(l)
+            }
+        }
+        SettingSwitch("Modo simples", "Esconde a aba Jornada e deixa o Início só com o essencial.", st.simpleMode) { set("simpleMode", it) }
+        SettingSwitch("Animações", "Movimentos da mascote, gráficos e transições.", st.animations) { set("animations", it) }
+        SettingSwitch("Confete nas conquistas", "Chuva de confete quando você conclui algo.", st.confetti, enabled = st.animations) { set("confetti", it) }
+        SettingSwitch("Vibração", "Uma vibração curta ao comemorar.", st.haptics) { set("haptics", it) }
+
+        SectionTitle("Privacidade")
+        SettingSwitch("Esconder valores", "Mostra R$ ••••• no lugar dos valores. Bom para usar o app em público. Também dá para alternar pelo olho no Início.", st.hideValues) { set("hideValues", it) }
+        val secure = br.com.casaclara.ui.deviceSecure(ctx)
+        SettingSwitch("Bloquear o app", if (secure) "Pede a senha, o padrão ou a digital do celular ao abrir (e depois de 30 segundos fora). O app também fica oculto na tela de apps recentes."
+            else "Para usar, primeiro configure um bloqueio de tela no celular (PIN, padrão, senha ou digital).", st.lock, enabled = secure || st.lock) { set("lock", it) }
 
         SectionTitle("Notificações")
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { Text("Lembretes ativados", fontWeight = FontWeight.Bold); Text("Contas, tarefas, metas, mudança e manutenção.", style = MaterialTheme.typography.bodySmall) }
             Switch(checked = p.notifications, onCheckedChange = { on -> scope.launch { c.prefs.update { it.copy(notifications = on) } } })
+        }
+        val stn = p.settings
+        Text("Horário padrão dos novos lembretes: %02d:%02d".format(stn.reminderMinute / 60, stn.reminderMinute % 60), fontWeight = FontWeight.Bold)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            listOf(7, 8, 9, 12, 18, 20).forEach { h -> FilterChip(stn.reminderMinute == h * 60, { scope.launch { c.prefs.setSetting("reminderMinute", (h * 60).toString()) } }, { Text("%02d:00".format(h)) }) }
+        }
+        SettingSwitch("Resumo da semana", "Todo domingo às 19h: quanto gastou e quantas tarefas fez.", stn.weeklySummary) { on ->
+            scope.launch { c.prefs.setSetting("weeklySummary", on) }
+            br.com.casaclara.notifications.WeeklySummary.schedule(ctx, on)
         }
         SecondaryButton("🔔 Gerenciar lembretes", Modifier.fillMaxWidth()) { nav.navigate(Routes.REMINDERS) }
 
@@ -417,5 +476,17 @@ fun ContactsScreen(c: AppContainer, nav: NavController) {
         listOf("chamar-profissional", "sinais-vazamento", "vazamento-gas", "eletricidade", "manutencao-preventiva").forEach { id ->
             Library.BY_ID[id]?.let { g -> ItemRow("${g.emoji} ${g.title}", onClick = { nav.navigate(Routes.guide(g.id)) }) }
         }
+    }
+}
+
+
+@Composable
+private fun SettingSwitch(title: String, sub: String, checked: Boolean, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth().selectable(checked, enabled = enabled, role = Role.Switch) { onChange(!checked) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f).padding(end = 8.dp)) {
+            Text(title, fontWeight = FontWeight.Bold, color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(sub, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Switch(checked = checked, onCheckedChange = null, enabled = enabled)
     }
 }

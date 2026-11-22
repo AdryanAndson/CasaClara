@@ -49,6 +49,9 @@ if [ -f new/app-release.apk ]; then
     sleep 4; adb shell am force-stop $PKG; sleep 2
   done
   adb shell am start -W -n $PKG/.MainActivity > /dev/null; sleep 4
+  # atalho do ícone: abre direto na tela de emergência
+  adb shell am force-stop $PKG; adb shell am start -W -n $PKG/.MainActivity --es route emergency > /dev/null; sleep 4
+  adb exec-out screencap -p > shots/98-atalho-emergencia.png || true
   adb shell monkey -p $PKG --pct-syskeys 0 --pct-appswitch 0 --throttle 120 -s 7 800 > shots/monkey.txt 2>&1 || true
   sleep 3
   adb exec-out screencap -p > shots/99-release.png || true

@@ -46,6 +46,38 @@ data class UserPrefs(
     val cleanMinutes: Int = 15,
 )
 
+/** Ajustes do app (guardados junto com as calculadoras, na chave "ajustes"). */
+data class AppSettings(
+    val accent: String = "VERDE",
+    val classicFont: Boolean = false,
+    val hideValues: Boolean = false,
+    val lock: Boolean = false,
+    val reminderMinute: Int = 9 * 60,
+    val animations: Boolean = true,
+    val confetti: Boolean = true,
+    val weeklySummary: Boolean = false,
+    val simpleMode: Boolean = false,
+    val haptics: Boolean = true,
+) {
+    companion object {
+        const val KEY = "ajustes"
+        fun from(m: Map<String, String>) = AppSettings(
+            accent = m["accent"] ?: "VERDE",
+            classicFont = m["classicFont"] == "1",
+            hideValues = m["hideValues"] == "1",
+            lock = m["lock"] == "1",
+            reminderMinute = m["reminderMinute"]?.toIntOrNull()?.coerceIn(0, 1439) ?: 9 * 60,
+            animations = m["animations"] != "0",
+            confetti = m["confetti"] != "0",
+            weeklySummary = m["weeklySummary"] == "1",
+            simpleMode = m["simpleMode"] == "1",
+            haptics = m["haptics"] != "0",
+        )
+    }
+}
+
+val UserPrefs.settings: AppSettings get() = AppSettings.from(calc[AppSettings.KEY].orEmpty())
+
 class Prefs(private val context: Context) {
     private object K {
         val onboarded = booleanPreferencesKey("onboarded")
@@ -142,6 +174,15 @@ class Prefs(private val context: Context) {
     suspend fun setCalc(id: String, values: Map<String, String>) {
         context.dataStore.edit { it[stringPreferencesKey(K.calcPrefix + id)] = encodeMap(values) }
     }
+
+    suspend fun setSetting(key: String, value: String) {
+        context.dataStore.edit {
+            val k = stringPreferencesKey(K.calcPrefix + AppSettings.KEY)
+            val cur = it[k]?.let(::decodeMap).orEmpty()
+            it[k] = encodeMap(cur + (key to value))
+        }
+    }
+    suspend fun setSetting(key: String, value: Boolean) = setSetting(key, if (value) "1" else "0")
 
     suspend fun clearAll() { context.dataStore.edit { it.clear() } }
 
