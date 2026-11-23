@@ -1,0 +1,4 @@
+debug: TotalTime: 2924
+release frio 1: TotalTime: 1388
+release frio 2: TotalTime: 1502
+release frio 3: TotalTime: 1459
