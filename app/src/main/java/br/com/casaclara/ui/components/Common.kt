@@ -1,5 +1,7 @@
 package br.com.casaclara.ui.components
 
+import androidx.compose.foundation.layout.heightIn
+
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -331,14 +333,15 @@ fun CartoonButton(text: String, modifier: Modifier = Modifier, enabled: Boolean 
     val source = remember { MutableInteractionSource() }
     val pressed by source.collectIsPressedAsState()
     val press = if (pressed && enabled) 3.dp else 0.dp
-    Box(modifier.height(height + 4.dp)) {
+    // cresce na altura quando o texto ocupa 2 linhas (nada é cortado)
+    Box(modifier.height(androidx.compose.foundation.layout.IntrinsicSize.Min)) {
         Box(Modifier.matchParentSize().padding(top = 4.dp, start = 4.dp).clip(RoundedCornerShape(16.dp)).background(if (enabled) ink else ink.copy(alpha = 0.3f)))
         Button(
             onClick = onClick, enabled = enabled, interactionSource = source,
-            modifier = Modifier.fillMaxWidth().height(height).offset(x = press, y = press).border(2.5.dp, if (enabled) ink else ink.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
+            modifier = Modifier.padding(bottom = 4.dp).fillMaxWidth().heightIn(min = height).offset(x = press, y = press).border(2.5.dp, if (enabled) ink else ink.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = container, contentColor = content),
-        ) { Text(text, style = MaterialTheme.typography.labelLarge, maxLines = 2) }
+        ) { Text(text, style = MaterialTheme.typography.labelLarge, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center) }
     }
 }
 
