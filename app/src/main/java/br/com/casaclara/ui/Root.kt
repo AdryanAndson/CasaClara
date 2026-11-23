@@ -204,7 +204,14 @@ private fun AppContent(c: AppContainer, p: UserPrefs, pendingRoute: androidx.com
         Box(Modifier.fillMaxSize()) {
             Scaffold(
                 containerColor = MaterialTheme.colorScheme.background,
-                bottomBar = { if (showBottom) BottomBar(nav, route, p.settings.simpleMode) },
+                bottomBar = {
+                    androidx.compose.foundation.layout.Column {
+                        val noAds = p.settings.adFreeUntil > System.currentTimeMillis()
+                        // anúncio discreto só em telas de leitura e ferramentas
+                        br.com.casaclara.ads.AdBanner(!noAds && br.com.casaclara.ads.AD_ROUTES.any { route.startsWith(it) })
+                        if (showBottom) BottomBar(nav, route, p.settings.simpleMode)
+                    }
+                },
             ) { pad ->
                 NavHost(nav, startDestination = if (p.onboarded) Routes.HOME else Routes.ONBOARDING, modifier = Modifier.padding(pad)) {
                     composable(Routes.ONBOARDING) { OnboardingScreen(c) { nav.navigate(it) { popUpTo(0) { inclusive = true } } } }

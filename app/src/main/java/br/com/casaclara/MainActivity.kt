@@ -23,5 +23,7 @@ class MainActivity : ComponentActivity() {
         val container = (application as CasaClaraApp).container
         if (savedInstanceState == null) intent?.getStringExtra("route")?.let { pendingRoute.value = it }
         setContent { CasaClaraRoot(container, pendingRoute) }
+        // consentimento + anúncios em segundo plano (não atrasa a abertura)
+        window.decorView.post { runCatching { br.com.casaclara.ads.Ads.start(this) } }
     }
 }

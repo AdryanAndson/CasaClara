@@ -146,7 +146,7 @@ fun RemindersScreen(c: AppContainer, nav: NavController) {
     }
     fun ensurePermission() { if (!granted && Build.VERSION.SDK_INT >= 33) explain = true }
     Page(nav, "Lembretes") {
-        ScreenHeader("Lembretes", "Contas, tarefas, metas, mudança e manutenção. Tudo local, sem internet.", mood = Mood.DICA)
+        ScreenHeader("Lembretes", "Contas, tarefas, metas, mudança e manutenção. Tudo fica no seu aparelho.", mood = Mood.DICA)
         if (!granted && Build.VERSION.SDK_INT >= 33) {
             if (explain || items.any { it.enabled }) MascotBubble("Para avisar na hora certa, preciso da permissão de notificações. Uso só para os lembretes que você criar — nada de propaganda.", Mood.DICA) {
                 Button(onClick = { permission.launch(Manifest.permission.POST_NOTIFICATIONS) }) { Text("Permitir notificações") }
@@ -285,8 +285,26 @@ fun SettingsScreen(c: AppContainer, nav: NavController) {
         }
         SecondaryButton("🔔 Gerenciar lembretes", Modifier.fillMaxWidth()) { nav.navigate(Routes.REMINDERS) }
 
+        SectionTitle("Anúncios")
+        val sta = p.settings
+        val now = System.currentTimeMillis()
+        Text("Os anúncios mantêm o Casa Clara gratuito. Eles aparecem só em telas de leitura e ferramentas — nunca em Emergência, no detector de golpe ou enquanto você preenche algo.", style = MaterialTheme.typography.bodySmall)
+        if (sta.adFreeUntil > now) {
+            val dias = ((sta.adFreeUntil - now) / 86_400_000L).toInt() + 1
+            AlertBox("Sem anúncios por mais $dias dia(s). Obrigado pelo apoio! 💛", "OK")
+        }
+        val act = ctx as? android.app.Activity
+        SecondaryButton("🎬 Assistir um vídeo e ficar 3 dias sem anúncios", Modifier.fillMaxWidth()) {
+            if (act != null) br.com.casaclara.ads.Ads.showRewarded(act, onReward = {
+                scope.launch { c.prefs.setSetting("adFreeUntil", (maxOf(System.currentTimeMillis(), sta.adFreeUntil) + 3 * 86_400_000L).toString()) }
+                fb.celebrate("Pronto! 3 dias sem anúncios.")
+            }, onFail = { fb.toast(it, Mood.PENSANDO) })
+        }
+        if (br.com.casaclara.ads.Ads.privacyOptionsRequired.value && act != null)
+            SecondaryButton("🔏 Opções de privacidade dos anúncios", Modifier.fillMaxWidth()) { br.com.casaclara.ads.Ads.showPrivacyOptions(act) }
+
         SectionTitle("Seus dados")
-        AlertBox("Seus dados ficam guardados neste aparelho, no banco de dados do app. Não há conta nem servidor do Casa Clara: nenhum dado financeiro é enviado para a internet. Se o backup do Android estiver ligado na sua conta Google, o próprio Android pode incluir o app nele.", "INFO")
+        AlertBox("Seus dados ficam guardados neste aparelho, no banco de dados do app. Não há conta nem servidor do Casa Clara: nenhum dado financeiro é enviado para a internet. A internet é usada só para mostrar os anúncios, que não recebem nada do que você cadastra. Se o backup do Android estiver ligado na sua conta Google, o próprio Android pode incluir o app nele.", "INFO")
         SecondaryButton("💾 Fazer cópia de segurança", Modifier.fillMaxWidth()) { backup.launch("casa-clara-backup-${Dates.today()}.db") }
         SecondaryButton("📂 Restaurar cópia de segurança", Modifier.fillMaxWidth()) { restore.launch(arrayOf("*/*")) }
         SecondaryButton("📄 Exportar finanças (CSV)", Modifier.fillMaxWidth()) { export.launch("casa-clara-financas-${Dates.today()}.csv") }

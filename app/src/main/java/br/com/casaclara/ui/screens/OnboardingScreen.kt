@@ -168,7 +168,7 @@ fun OnboardingScreen(c: AppContainer, onDone: (String) -> Unit) {
                         "🧹" to "Cuide da casa com rotinas, listas e lembretes.",
                         "📚" to "Consulte ${br.com.casaclara.domain.content.Library.GUIDES.size} guias práticos para a vida adulta.",
                     ).forEach { (e, t) -> Row(verticalAlignment = Alignment.CenterVertically) { Text(e, style = MaterialTheme.typography.headlineSmall); Spacer(Modifier.width(12.dp)); Text(t) } }
-                    AlertBox("Sem cadastro e sem internet: seus dados ficam guardados só neste aparelho.", "OK")
+                    AlertBox("Sem cadastro: seus dados ficam guardados só neste aparelho e funcionam sem internet.", "OK")
                     PrimaryButton("Começar", Modifier.fillMaxWidth()) { next() }
                 }
                 OStep.NOME -> {

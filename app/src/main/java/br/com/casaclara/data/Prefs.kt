@@ -58,6 +58,8 @@ data class AppSettings(
     val weeklySummary: Boolean = false,
     val simpleMode: Boolean = false,
     val haptics: Boolean = true,
+    /** Momento (millis) até quando o app fica sem anúncios (vídeo premiado). */
+    val adFreeUntil: Long = 0L,
 ) {
     companion object {
         const val KEY = "ajustes"
@@ -72,6 +74,7 @@ data class AppSettings(
             weeklySummary = m["weeklySummary"] == "1",
             simpleMode = m["simpleMode"] == "1",
             haptics = m["haptics"] != "0",
+            adFreeUntil = m["adFreeUntil"]?.toLongOrNull() ?: 0L,
         )
     }
 }

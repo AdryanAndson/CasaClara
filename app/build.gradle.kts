@@ -13,10 +13,14 @@ android {
         applicationId = "br.com.casaclara"
         minSdk = 26
         targetSdk = 36
-        versionCode = 310
-        versionName = "3.1.0"
+        versionCode = 320
+        versionName = "3.2.0"
         vectorDrawables { useSupportLibrary = true }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Anúncios: IDs ficam em gradle.properties (casaclara.admob.*)
+        manifestPlaceholders["admobAppId"] = providers.gradleProperty("casaclara.admob.appId").get()
+        resValue("string", "ad_banner_id", providers.gradleProperty("casaclara.admob.banner").get())
+        resValue("string", "ad_rewarded_id", providers.gradleProperty("casaclara.admob.rewarded").get())
     }
 
     // Chave de teste fixa: todo APK gerado pelo CI tem a mesma assinatura,
@@ -44,7 +48,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
-    buildFeatures { compose = true }
+    buildFeatures { compose = true; resValues = true }
     bundle {
         language { enableSplit = false } // app só em português; mantém todos os textos juntos
     }
@@ -77,6 +81,8 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.emoji2.bundled)
     implementation(libs.androidx.profileinstaller)
+    implementation(libs.play.services.ads)
+    implementation(libs.ump)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
