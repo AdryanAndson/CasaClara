@@ -13,8 +13,8 @@ android {
         applicationId = "br.com.casaclara"
         minSdk = 26
         targetSdk = 36
-        versionCode = 320
-        versionName = "3.2.0"
+        versionCode = 330
+        versionName = "3.3.0"
         vectorDrawables { useSupportLibrary = true }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Anúncios: IDs ficam em gradle.properties (casaclara.admob.*)

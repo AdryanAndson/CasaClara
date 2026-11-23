@@ -244,6 +244,8 @@ private fun AppContent(c: AppContainer, p: UserPrefs, pendingRoute: androidx.com
                     composable(Routes.CONSUMO) { br.com.casaclara.ui.screens.ConsumptionScreen(c, nav) }
                     composable(Routes.GOLPE) { br.com.casaclara.ui.screens.ScamScreen(c, nav) }
                     composable(Routes.QUIZ) { br.com.casaclara.ui.screens.QuizScreen(c, nav) }
+                    composable(Routes.MODELS) { br.com.casaclara.ui.screens.ModelsScreen(c, nav) }
+                    composable(Routes.MODEL, arguments = listOf(navArgument("id") { type = NavType.StringType })) { e -> br.com.casaclara.ui.screens.ModelScreen(c, nav, e.arguments?.getString("id") ?: "") }
                 }
             }
             if (confettiKey != 0L && UiFlags.confetti.value) Confetti(confettiKey)
@@ -261,7 +263,7 @@ private fun androidx.navigation.NavGraphBuilder.tabRoute(route: String, content:
 private fun BottomBar(nav: NavHostController, route: String, simple: Boolean = false) {
     NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
         BOTTOM.filter { !simple || it.prefix != "journey" }.forEach { item ->
-            val selected = route.startsWith(item.prefix) || (item.prefix == "more" && listOf("moving", "market", "furniture", "shared", "library", "guide", "achievements", "settings", "profile", "reminders", "calc", "search", "plans", "contacts", "customize", "timer", "weekplan", "import", "emergency", "docs", "consumo", "golpe", "quiz").any { route.startsWith(it) })
+            val selected = route.startsWith(item.prefix) || (item.prefix == "more" && listOf("moving", "market", "furniture", "shared", "library", "guide", "achievements", "settings", "profile", "reminders", "calc", "search", "plans", "contacts", "customize", "timer", "weekplan", "import", "emergency", "docs", "consumo", "golpe", "quiz", "models", "model").any { route.startsWith(it) })
             NavigationBarItem(
                 selected = selected,
                 onClick = {

@@ -93,4 +93,4 @@ fun AdBanner(enabled: Boolean, modifier: Modifier = Modifier) {
 }
 
 /** Telas onde o banner pode aparecer (prefixos de rota). */
-val AD_ROUTES = listOf("library", "guide", "calc", "market", "moving", "furniture", "quiz", "more", "search", "achievements")
+val AD_ROUTES = listOf("library", "guide", "calc", "market", "moving", "furniture", "quiz", "more", "search", "achievements", "models")

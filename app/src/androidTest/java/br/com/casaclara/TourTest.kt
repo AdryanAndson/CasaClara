@@ -88,6 +88,7 @@ class TourTest {
             tap("Documentos e validades"); shot("documentos"); back()
             tap("Consumo de luz, água e gás"); shot("consumo"); back()
             tap("Teste rápido"); shot("quiz"); back()
+            tap("Modelos prontos"); shot("modelos"); tap("Pedir conserto ao proprietário"); shot("modelo"); scrollDown(); shot("modelo-2"); back(); back()
             tap("Calculadoras"); tap("Salário líquido", substring = true); shot("salario"); back(); back()
             tap("Dicas e guias"); shot("biblioteca")
             tap("Golpes e segurança digital", substring = true); shot("categoria")

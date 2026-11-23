@@ -32,6 +32,9 @@ object Routes {
     const val CONSUMO = "consumo"
     const val GOLPE = "golpe"
     const val QUIZ = "quiz"
+    const val MODELS = "models"
+    const val MODEL = "model/{id}"
+    fun model(id: String) = "model/$id"
 
     fun finance(tab: Int = 0) = "finance?tab=$tab"
     fun house(tab: Int = 0) = "house?tab=$tab"

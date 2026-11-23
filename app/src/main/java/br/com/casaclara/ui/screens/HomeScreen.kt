@@ -163,6 +163,7 @@ private fun Hero(d: HomeData, nav: NavController) {
         sum.sobrou < 0 && sum.entrou > 0 -> "Este mês saiu mais do que entrou. Sem pânico: bora olhar os gastos juntos."
         d.j.next == null -> "Jornada completa! Agora é manter a casa no ritmo. 🎉"
         d.j.doneCount <= 1 -> if (d.p.situation == Situation.PAIS || d.p.situation == Situation.JUNTANDO) "Vamos descobrir quanto custa morar sozinho?" else "Bora deixar a casa e as contas no jeito?"
+        d.j.doneCount % 3 == 0 -> br.com.casaclara.domain.content.MascotLines.of(Dates.today().toEpochDay())
         else -> "Você já fez ${d.j.doneCount} de ${d.j.total} passos. Bora pro próximo?"
     }
     BrandCard(Modifier.padding(top = 8.dp), tone = Tone.AMARELO, padding = 14.dp) {

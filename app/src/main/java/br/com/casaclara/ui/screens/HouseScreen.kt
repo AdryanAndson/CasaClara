@@ -1,5 +1,9 @@
 package br.com.casaclara.ui.screens
 
+import androidx.compose.runtime.remember
+
+import androidx.compose.runtime.mutableStateOf
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -287,6 +291,33 @@ fun ShoppingList(c: AppContainer, list: String, categories: List<String>, title:
     val total = withPrice.sumOf { (it.qty * (it.price ?: 0)).toLong() }
     val inCart = withPrice.filter { it.bought }.sumOf { (it.qty * (it.price ?: 0)).toLong() }
     val semPreco = shown.size - withPrice.size
+    var pickList by remember { mutableStateOf(false) }
+    val ready = br.com.casaclara.domain.content.ListTemplates.ALL.filter { it.target == list }
+    if (!favoritesOnly && ready.isNotEmpty()) {
+        br.com.casaclara.ui.components.SecondaryButton("📋 Usar uma lista pronta", Modifier.fillMaxWidth()) { pickList = true }
+        if (pickList) androidx.compose.material3.AlertDialog(
+            onDismissRequest = { pickList = false },
+            title = { Text("Listas prontas") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Os itens entram na sua lista sem preço (você informa). Itens que já estão lá não se repetem.", style = MaterialTheme.typography.bodySmall)
+                    ready.forEach { lt ->
+                        BrandCard(padding = 10.dp, onClick = {
+                            val have = items.map { it.name.trim().lowercase() }.toSet()
+                            val add = lt.items.filter { it.name.trim().lowercase() !in have }
+                            scope.launch { add.forEach { i -> c.db.shop().upsert(ShopEntity(list = list, name = i.name, category = if (i.category in categories) i.category else categories.last(), qty = i.qty, unit = i.unit)) } }
+                            pickList = false
+                            fb.toast(if (add.isEmpty()) "Esses itens já estão na sua lista." else "${add.size} item(ns) adicionados!", Mood.FELIZ)
+                        }) {
+                            Text("${lt.emoji} ${lt.title}", fontWeight = FontWeight.Bold)
+                            Text("${lt.items.size} itens · ${lt.description}", style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { pickList = false }) { Text("Fechar") } },
+        )
+    }
     if (shown.isNotEmpty()) BrandCard(tone = Tone.AMARELO) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             br.com.casaclara.ui.components.Stat("Estimativa", Money.format(total), Modifier.weight(1f))

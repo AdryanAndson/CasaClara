@@ -30,6 +30,7 @@ fun MoreScreen(@Suppress("UNUSED_PARAMETER") c: AppContainer, nav: NavController
             Entry("🛡️", "É golpe?", "Detector de golpe para mensagens e ligações", Routes.GOLPE),
             Entry("🪪", "Documentos e validades", "Avisos antes de vencer CNH, contrato, seguro", Routes.DOCS),
             Entry("💡", "Consumo de luz, água e gás", "Leitura do medidor e conta estimada", Routes.CONSUMO),
+            Entry("✉️", "Modelos prontos", "${br.com.casaclara.domain.content.MessageTemplates.ALL.size} mensagens e cartas para preencher e enviar", Routes.MODELS),
         ),
         "Ferramentas" to listOf(
             Entry("📦", "Mudança e aluguel", "Checklist, cronograma, documentos, imóveis", Routes.moving(0)),

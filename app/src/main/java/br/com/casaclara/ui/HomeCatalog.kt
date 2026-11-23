@@ -37,6 +37,7 @@ object Tools {
     val ALL = listOf(
         ToolDef("lancar", "🧾", "Lançar gasto", Routes.finance(Routes.FinanceTab.LANCAMENTOS)),
         ToolDef("emergencia", "🆘", "Emergência", Routes.EMERGENCY),
+        ToolDef("modelos", "✉️", "Modelos prontos", Routes.MODELS),
         ToolDef("golpe", "🛡️", "É golpe?", Routes.GOLPE),
         ToolDef("docs", "🪪", "Documentos", Routes.DOCS),
         ToolDef("consumo", "💡", "Consumo", Routes.CONSUMO),

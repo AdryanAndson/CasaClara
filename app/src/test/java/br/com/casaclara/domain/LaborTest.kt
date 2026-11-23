@@ -105,3 +105,21 @@ class MoneyPlusTest {
         assertEquals(300L, Challenge52.saved(100, setOf(1, 2)))
     }
 }
+
+class MessageTemplatesTest {
+    @Test fun modelos_consistentes() {
+        val t = br.com.casaclara.domain.content.MessageTemplates
+        assertEquals(t.ALL.size, t.ALL.map { it.id }.toSet().size)
+        assertTrue(t.ALL.size >= 30)
+        val cats = t.CATS.map { it.id }.toSet()
+        t.ALL.forEach { m ->
+            assertTrue("${m.id}: categoria", m.cat in cats)
+            m.fields.forEach { f -> assertTrue("${m.id}: campo $f sem rótulo", t.LABELS.containsKey(f)) }
+            m.guide?.let { assertTrue("${m.id}: guia $it", br.com.casaclara.domain.content.Library.BY_ID.containsKey(it)) }
+        }
+        val m = t.BY_ID.getValue("cheguei")
+        assertEquals(m.body, m.fill(emptyMap()))
+        val p = t.BY_ID.getValue("pedir-recibo").fill(mapOf("nome" to "Ana"))
+        assertTrue(p.contains("Ana") && p.contains("[Para quem (nome)]"))
+    }
+}

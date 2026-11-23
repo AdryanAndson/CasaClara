@@ -216,6 +216,11 @@ fun GuideScreen(c: AppContainer, nav: NavController, id: String) {
                 })
             }
         }
+        val models = br.com.casaclara.domain.content.MessageTemplates.ALL.filter { it.guide == g.id }
+        if (models.isNotEmpty()) {
+            SectionTitle("✉️ Modelos prontos para essa situação")
+            models.forEach { m -> br.com.casaclara.ui.components.SecondaryButton("${m.emoji} ${m.title}", Modifier.fillMaxWidth()) { nav.navigate(Routes.model(m.id)) } }
+        }
         val rel = Library.related(g)
         if (rel.isNotEmpty()) {
             SectionTitle("Conteúdo relacionado")
